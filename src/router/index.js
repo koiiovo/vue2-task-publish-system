@@ -4,12 +4,15 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import ForgotPassword from '../views/ForgotPassword.vue';
 
+import MainLayout from '@/layouts/MainLayout.vue';
+
 Vue.use(Router);
 
 const routes = [
   { path: '/login', component: Login },
   { path: '/register', component: Register },
   { path: '/forgot-password', component: ForgotPassword },
+  { path: '/', component: MainLayout },  // 使用 MainLayout 布局
 ];
 
 const router = new Router({

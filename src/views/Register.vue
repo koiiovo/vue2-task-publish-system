@@ -5,6 +5,9 @@
 
     <!-- 注册表单容器 -->
     <div class="form-container">
+      <!-- Logo 图片 -->
+      <img src="@/assets/logo.png" alt="Logo" class="logo" />
+
       <h2 class="form-title">注册</h2>
 
       <!-- 学号输入框，失去焦点时检查学号是否已存在 -->
@@ -122,6 +125,11 @@ export default {
   align-items: center; /* 水平居中对齐 */
   gap: 12px; /* 元素之间的间隙 */
   z-index: 1; /* 使表单处于背景之上 */
+}
+
+.logo {
+  width: 35px;
+  height: 35px;
 }
 
 /* 表单标题样式 */

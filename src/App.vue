@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <router-view></router-view> <!-- 在这里渲染匹配的组件 -->
+    <router-view /> <!-- 渲染路由匹配的页面 -->
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
-}
+  name: "App",
+};
 </script>
 
 <style>
