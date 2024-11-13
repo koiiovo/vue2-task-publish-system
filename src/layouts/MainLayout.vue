@@ -5,16 +5,17 @@
       <img src="@/assets/logo.png" alt="Logo" class="logo" />
       <h2>花开富贵派单平台</h2>
     </div>
+
     <!-- 导航栏容器 -->
     <div class="navigation">
-      <nav>
+      <nav role="navigation">
         <ul>
-          <li>首页</li>
-          <li>任务大厅</li>
-          <li>我的任务</li>
-          <li>我的团队</li>
-          <li>交流圈子</li>
-          <li>系统管理</li>
+          <li role="menuitem">首页</li>
+          <li role="menuitem">任务大厅</li>
+          <li role="menuitem">我的任务</li>
+          <li role="menuitem">我的团队</li>
+          <li role="menuitem">交流圈子</li>
+          <li role="menuitem">系统管理</li>
         </ul>
       </nav>
     </div>
@@ -22,25 +23,38 @@
     <!-- 页面最右边的功能区 -->
     <div class="right-side">
       <div class="message-icon">
-        <span class="icon">📩</span>
+        <span class="icon" aria-label="私信">
+          <font-awesome-icon icon="fas fa-comment-dots" />
+        </span>
+        <div class="icon-label">私信</div>
       </div>
 
       <div class="bell-icon">
-        <span class="icon">🔔</span>
+        <span class="icon" aria-label="通知">
+          <font-awesome-icon icon="fas fa-bell" />
+        </span>
         <div class="notification-count">3</div>
+        <div class="icon-label">通知</div>
       </div>
 
       <div
         class="avatar"
         @mouseover="showMenu = true"
         @mouseleave="showMenu = false"
+        aria-label="用户菜单"
+        role="button"
       >
-        <img src="@/assets/avatar.jpg" alt="Avatar" class="avatar-img" />
-        <div v-if="showMenu" class="avatar-menu">
+        <span class="avatar-img">
+          <span class="material-icons md-35"> account_circle </span>
+        </span>
+
+        <!-- 使用 v-bind:class 来控制显示 -->
+        <div v-show="showMenu" class="avatar-menu" aria-hidden="!showMenu">
           <ul>
-            <li>退出</li>
-            <li>资料设置</li>
-            <li>查看任务</li>
+            <li role="menuitem">资料设置</li>
+            <li role="menuitem">查看任务</li>
+            <li role="menuitem">查看佣金</li>
+            <li role="menuitem">退出</li>
           </ul>
         </div>
       </div>
@@ -52,7 +66,7 @@
 export default {
   data() {
     return {
-      showMenu: false,
+      showMenu: false,  // 控制菜单显示的状态
     };
   },
 };
@@ -63,10 +77,9 @@ export default {
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: 250px; /* 整体宽度保持不变 */
+  width: 250px;
   height: 100vh;
-  padding: 20px 10px;
-  position: relative; /* 使右侧的功能区定位相对 sidebar */
+  padding: 10px 0px;
 }
 
 /* Logo 和标题容器 */
@@ -75,7 +88,7 @@ export default {
   align-items: center;
   padding: 15px 20px;
   margin-bottom: 20px;
-  width: 100%; /* Logo 容器宽度占满侧边栏 */
+  width: 100%;
 }
 
 .logo {
@@ -101,7 +114,8 @@ export default {
   border-radius: 0 100px 0 0;
   padding: 20px 15px;
   box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.1);
-  width: 150px;
+  width: 60%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6), 0 15px 30px rgba(0, 0, 0, 0.6);
 }
 
 .navigation nav ul {
@@ -115,12 +129,13 @@ export default {
   cursor: pointer;
   color: #fff;
   font-size: 16px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .navigation nav ul li:hover {
   background-color: #1d2a3a;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(5px);
 }
 
 /* 页面最右边的功能区 */
@@ -130,20 +145,29 @@ export default {
   right: 20px;
   display: flex;
   align-items: center;
-  z-index: 1000; /* 保证最上层 */
 }
 
 .message-icon {
-  margin-right: 20px;
-  font-size: 18px;
+  margin-right: 25px;
+  font-size: 30px;
   cursor: pointer;
+  position: relative;
 }
 
 .bell-icon {
   position: relative;
-  margin-right: 20px;
-  font-size: 24px;
+  margin-right: 25px;
+  font-size: 30px;
   cursor: pointer;
+}
+
+/* 图标下方文字样式 */
+.icon-label {
+  font-size: 12px;
+  color: #333;
+  text-align: center;
+  margin-top: 0px;
+  position: absolute;
 }
 
 .notification-count {
@@ -167,22 +191,29 @@ export default {
 }
 
 .avatar-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   cursor: pointer;
 }
 
+.material-icons.md-35 {
+  font-size: 58px;
+  vertical-align:middle;
+  position: relative;
+  top: 12px;
+}
+
+/* 下拉菜单样式 */
 .avatar-menu {
   position: absolute;
-  top: 50px;
+  top: 75px;
   right: 0;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  width: 160px;
+  width: 120px;
   overflow: hidden;
+  z-index: 10; /* 确保菜单显示在其他内容之上 */
 }
+
 
 .avatar-menu ul {
   list-style: none;
