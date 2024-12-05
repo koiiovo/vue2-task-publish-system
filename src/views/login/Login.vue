@@ -58,7 +58,7 @@
 
       <!-- 登录按钮，动态变色和禁用 -->
       <button 
-        @click="login" 
+        @click="handleLogin" 
         class="login-button" 
         :class="{ disabled: !agreeToTerms }" 
         :disabled="!agreeToTerms"
@@ -86,6 +86,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Login",
   data() {
@@ -95,13 +97,52 @@ export default {
       isUserLogin: true, // 登录类型切换，默认为用户登录
       agreeToTerms: false, // 服务协议同意状态
       showModal: false, // 控制是否显示服务协议的模态框
+      users: [], // 存储从后台获取的用户数据
+      currentUser: null, // 当前登录的用户信息
     };
+  },
+  created() {
+    // 从后端获取所有用户信息
+    this.fetchUsers();
   },
   methods: {
     toggleLoginType(isUser) {
       this.isUserLogin = isUser;
     },
-    login() {
+    fetchUsers() {
+      axios.get("http://localhost:8080/loginUser/query")
+        .then((response) => {
+          this.users = response.data;
+        })
+        .catch((error) => {
+          console.error("获取用户信息失败", error);
+        });
+    },
+    validateUsername() {
+      const user = this.users.find((user) => user.username === this.usernameOrId);
+      if (!user) {
+        alert("用户名不存在！");
+        return false;
+      }
+      if (this.isUserLogin && user.role !== "USER") {
+        alert("该账号不是用户账号！");
+        return false;
+      } else if (!this.isUserLogin && user.role !== "ADMIN") {
+        alert("该账号不是管理员账号！");
+        return false;
+      }
+      this.currentUser = user;
+      return true;
+    },
+    validatePassword() {
+      if (this.currentUser && this.password === this.currentUser.password) {
+        return true;
+      } else {
+        alert("密码错误！");
+        return false;
+      }
+    },
+    handleLogin() {
       if (!this.usernameOrId || !this.password) {
         alert("请输入完整的账号和密码！");
         return;
@@ -110,17 +151,26 @@ export default {
         alert("请先同意服务协议和使用条款！");
         return;
       }
-      console.log("登录信息:", this.usernameOrId, this.password);
+
+      // 验证用户名和密码
+      if (this.validateUsername() && this.validatePassword()) {
+        console.log("登录成功");
+        // 在此进行登录成功后的操作，如保存 token，跳转页面等
+        this.$router.push({ path: "/" });
+      } else {
+        console.log("登录失败");
+      }
     },
     showTerms() {
       this.showModal = true;
     },
     closeTerms() {
       this.showModal = false;
-    }
+    },
   },
 };
 </script>
+
 
 <style scoped>
 /* 页面背景图层 */
