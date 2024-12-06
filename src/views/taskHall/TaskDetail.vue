@@ -4,40 +4,46 @@
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
       <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
       <el-breadcrumb-item>任务大厅</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/view-task' }"
-        >查看任务</el-breadcrumb-item
-      >
+      <el-breadcrumb-item :to="{ path: '/view-task' }">
+        查看任务
+      </el-breadcrumb-item>
       <el-breadcrumb-item>任务详情</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 返回按钮 -->
-    <el-button
-      class="back-button"
-      @click="goBack"
-      icon="el-icon-arrow-left"
-      type="text"
-      >返回</el-button
-    >
-
-    <!-- 任务详情展示 -->
+    <!-- 任务详情卡片 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
+        <el-button
+          icon="el-icon-arrow-left"
+          size="mini"
+          @click="$router.go(-1)"
+          class="back-btn"
+        ></el-button>
         <span>任务详情</span>
       </div>
 
-      <el-descriptions title="任务信息" direction="vertical" :column="2" border>
-        <el-descriptions-item label="任务名称">{{
-          task.taskName
-        }}</el-descriptions-item>
-        <el-descriptions-item label="发布人">{{
-          task.publisher
-        }}</el-descriptions-item>
-        <el-descriptions-item label="截止日期">{{
-          task.dueDate
-        }}</el-descriptions-item>
-        <el-descriptions-item label="佣金"
-          >{{ task.commission }} 元</el-descriptions-item
-        >
+      <!-- 任务信息 -->
+      <el-descriptions
+        title="任务信息"
+        direction="horizontal"
+        :column="3"
+        border
+      >
+        <el-descriptions-item label="任务名称">
+          {{ task.taskName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="提交方式">
+          {{ task.submissionMethod }}
+        </el-descriptions-item>
+        <el-descriptions-item label="任务发布人">
+          {{ task.publisher }}
+        </el-descriptions-item>
+        <el-descriptions-item label="佣金">
+          {{ task.commission }} 元
+        </el-descriptions-item>
+        <el-descriptions-item label="截止日期">
+          {{ task.dueDate }}
+        </el-descriptions-item>
         <el-descriptions-item label="紧急程度">
           <el-tag
             :type="
@@ -51,65 +57,89 @@
             {{ task.urgency }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="任务描述">{{
-          task.description
-        }}</el-descriptions-item>
+
+        <el-descriptions-item label="任务描述" :span="2">
+          <div class="task-description">
+            {{ task.description }}
+          </div>
+        </el-descriptions-item>
       </el-descriptions>
 
+      <!-- 分割线 -->
       <el-divider></el-divider>
 
-      <div class="task-actions">
+      <!-- 操作按钮 -->
+      <div class="accept-button-container">
+        <el-button v-if="!task.isAccepted" type="primary" @click="handleAccept">
+          接单
+        </el-button>
         <el-button
+          v-if="task.isAccepted"
           type="primary"
-          @click="handleAccept"
-          :disabled="task.isAccepted"
+          :disabled="true"
+          class="disabled-button"
         >
-          {{ task.isAccepted ? "已接单" : "接单" }}
+          进行中
         </el-button>
       </div>
     </el-card>
   </div>
 </template>
-  
-  <script>
+
+<script>
 export default {
-  props: ["taskId"], // 接收路由参数 taskId
+  props: ["taskName"],
   data() {
     return {
-      task: {}, // 任务详情对象
+      task: {},
     };
   },
   created() {
-    this.fetchTaskDetail(this.taskId); // 获取任务详情
+    this.fetchTaskDetail(this.taskName);
   },
   methods: {
-    fetchTaskDetail(taskId) {
-      // 模拟获取任务详情的 API 调用
-      const task = {
-        id: taskId,
-        taskName: "任务" + taskId,
-        publisher: "张三",
-        dueDate: "2024-12-15",
-        commission: 100,
-        urgency: "高",
-        description:
-          "这是任务的详细描述内容，可以包含任务的具体要求、注意事项等。",
-        isAccepted: false, // 默认未接单
-      };
-      this.task = task;
+    async fetchTaskDetail(taskName) {
+      try {
+        const response = await this.$api.get(`/detail/${taskName}`);
+        if (response && response.data) {
+          this.task = response.data;
+        } else {
+          console.error("返回的数据为空", response);
+          this.$message.error("任务详情为空");
+        }
+      } catch (error) {
+        console.error("请求错误:", error);
+        if (error.response) {
+          // 如果服务器返回了错误代码
+          console.error("后端返回错误：", error.response.data);
+          this.$message.error(
+            "获取任务详情失败：" + error.response.data.message
+          );
+        } else if (error.request) {
+          // 如果请求发出但没有收到响应
+          console.error("请求未收到响应：", error.request);
+          this.$message.error("网络问题，无法获取任务详情");
+        } else {
+          console.error("错误信息：", error.message);
+          this.$message.error("获取任务详情失败：" + error.message);
+        }
+      }
     },
     handleAccept() {
+      // 模拟接单操作
       this.task.isAccepted = true;
       this.$message.success("接单成功");
-    },
-    // 返回按钮的处理方法
-    goBack() {
-      this.$router.go(-1); // 跳转到上一个页面
+
+      // 这里可以实现实际的接单 API 调用，例如：
+      // this.$api.post(`/task/accept/${this.task.id}`).then(() => {
+      //   this.task.isAccepted = true;
+      //   this.$message.success("接单成功");
+      // });
     },
   },
 };
 </script>
-  
+
 <style scoped>
 .breadcrumb {
   position: sticky;
@@ -129,25 +159,64 @@ export default {
   background-color: #fff;
 }
 
-.breadcrumb {
-  margin-bottom: 20px;
+.el-tag.danger {
+  background-color: #f56c6c;
+  color: #fff;
+}
+
+.el-tag.warning {
+  background-color: #f7a800;
+  color: #fff;
+}
+
+.el-tag.success {
+  background-color: #67c23a;
+  color: #fff;
 }
 
 .box-card {
   padding: 20px;
 }
 
-.task-actions {
+.el-descriptions {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.task-description {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 202px; /* 限制最大高度 */
+  overflow-y: auto; /* 超过时显示垂直滚动条 */
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.accept-button-container {
+  display: flex;
+  justify-content: center;
   margin-top: 20px;
-  text-align: center;
+  padding: 10px;
 }
 
-.el-descriptions-item {
+.disabled-button {
+  background-color: #f0a500;
+  color: #fff;
+  border-color: #f0a500;
+}
+
+/* 返回按钮样式 */
+.back-btn {
+  margin-right: 10px;
+  padding: 0;
+  border-radius: 5px;
   font-size: 16px;
-}
-
-.back-button {
-  margin-bottom: 20px;
+  background-color: #34b4a7;
+  color: #fff;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
-  

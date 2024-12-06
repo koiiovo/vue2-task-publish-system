@@ -12,10 +12,7 @@
 
       <!-- 切换登录类型 -->
       <div class="login-type">
-        <button
-          :class="{ active: isUserLogin }"
-          @click="toggleLoginType(true)"
-        >
+        <button :class="{ active: isUserLogin }" @click="toggleLoginType(true)">
           用户登录
         </button>
         <button
@@ -37,11 +34,7 @@
 
       <!-- 密码输入框 -->
       <div class="input-container password-container">
-        <input
-          type="password"
-          v-model="password"
-          placeholder="请输入密码"
-        />
+        <input type="password" v-model="password" placeholder="请输入密码" />
         <!-- 忘记密码链接 -->
         <p class="forgot-password">
           <router-link to="/forgot-password">忘记密码？</router-link>
@@ -52,15 +45,16 @@
       <div class="terms-container">
         <input type="checkbox" v-model="agreeToTerms" id="terms-checkbox" />
         <label for="terms-checkbox">
-          我已阅读并同意 <a href="#" @click.prevent="showTerms">服务协议与使用条款</a>
+          我已阅读并同意
+          <a href="#" @click.prevent="showTerms">服务协议与使用条款</a>
         </label>
       </div>
 
       <!-- 登录按钮，动态变色和禁用 -->
-      <button 
-        @click="handleLogin" 
-        class="login-button" 
-        :class="{ disabled: !agreeToTerms }" 
+      <button
+        @click="handleLogin"
+        class="login-button"
+        :class="{ disabled: !agreeToTerms }"
         :disabled="!agreeToTerms"
       >
         登录
@@ -76,9 +70,7 @@
     <div v-if="showModal" class="modal">
       <div class="modal-content">
         <h3>服务协议与使用条款</h3>
-        <p>
-          这是服务协议的内容...（这里可以放具体的服务条款）
-        </p>
+        <p>这是服务协议的内容...（这里可以放具体的服务条款）</p>
         <button @click="closeTerms">关闭</button>
       </div>
     </div>
@@ -102,6 +94,8 @@ export default {
     };
   },
   created() {
+    // 检查用户是否已经登录，如果是，尝试刷新令牌
+    this.checkLoginStatus();
     // 从后端获取所有用户信息
     this.fetchUsers();
   },
@@ -110,7 +104,8 @@ export default {
       this.isUserLogin = isUser;
     },
     fetchUsers() {
-      axios.get("http://localhost:8080/loginUser/query")
+      axios
+        .get("http://localhost:8080/loginUser/query")
         .then((response) => {
           this.users = response.data;
         })
@@ -119,7 +114,9 @@ export default {
         });
     },
     validateUsername() {
-      const user = this.users.find((user) => user.username === this.usernameOrId);
+      const user = this.users.find(
+        (user) => user.username === this.usernameOrId
+      );
       if (!user) {
         alert("用户名不存在！");
         return false;
@@ -154,12 +151,73 @@ export default {
 
       // 验证用户名和密码
       if (this.validateUsername() && this.validatePassword()) {
-        console.log("登录成功");
-        // 在此进行登录成功后的操作，如保存 token，跳转页面等
-        this.$router.push({ path: "/" });
+        // 登录请求
+        axios
+          .post("http://localhost:8080/loginUser/login", {
+            username: this.usernameOrId,
+            password: this.password,
+          })
+          .then((response) => {
+            // 假设后端返回一个 token 和 refreshToken
+            const token = response.data.data.token;
+            const refreshToken = response.data.data.refreshToken;
+            console.log("登录成功，token: ", token); // 输出 token
+
+            // 存储 token 和 refreshToken
+            localStorage.setItem("token", token);
+            localStorage.setItem("refreshToken", refreshToken);
+
+            // 页面跳转
+            this.$router.push({ path: "/" }); // 登录成功后跳转到主页
+          })
+          .catch((error) => {
+            console.error("登录失败：", error);
+            alert("登录失败，请检查用户名或密码！");
+          });
       } else {
         console.log("登录失败");
       }
+    },
+    checkLoginStatus() {
+      // 检查用户是否已经登录
+      const token = localStorage.getItem("token");
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (token) {
+        // 如果令牌存在，验证令牌是否过期
+        this.validateToken(token, refreshToken);
+      }
+    },
+    validateToken(token, refreshToken) {
+      // 使用 Axios 调用后台接口，验证 token 是否有效
+      axios
+        .post("http://localhost:8080/loginUser/validate-token", { token })
+        .then((response) => {
+          if (!response.data.valid) {
+            console.log("令牌无效，尝试刷新令牌");
+            this.refreshToken(refreshToken);
+          }
+        })
+        .catch((error) => {
+          console.error("令牌验证失败", error);
+        });
+    },
+    refreshToken(refreshToken) {
+      // 刷新令牌的逻辑
+      axios
+        .post("http://localhost:8080/loginUser/refresh-token", {
+          refreshToken,
+        })
+        .then((response) => {
+          const newToken = response.data.data.token;
+          localStorage.setItem("token", newToken); // 存储新的令牌
+          console.log("令牌刷新成功:", newToken);
+        })
+        .catch((error) => {
+          console.error("刷新令牌失败", error);
+          alert("登录状态过期，请重新登录！");
+          this.$router.push({ path: "/login" }); // 重定向到登录页面
+        });
     },
     showTerms() {
       this.showModal = true;
@@ -379,5 +437,4 @@ export default {
 .modal-content button:hover {
   background-color: #0056b3;
 }
-
 </style>

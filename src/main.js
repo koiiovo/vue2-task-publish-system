@@ -2,9 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
 import router from './router'
-import axios from 'axios'
 import ElementUI from 'element-ui'
 import './mock/mock.js'
+
 
 //Google的 Material Icons CSS
 import 'material-icons/iconfont/material-icons.css'
@@ -27,11 +27,18 @@ Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
 // 引入 Element UI 样式
 import 'element-ui/lib/theme-chalk/index.css' 
 
-// 将 axios 添加到 Vue 原型
-Vue.prototype.$axios = axios;
-
 Vue.config.productionTip = false
 Vue.use(ElementUI)
+
+
+import axios from 'axios'
+Vue.prototype.$axios = axios;// 将 axios 挂载到 Vue 原型
+
+import apiClient from './api/task';
+Vue.prototype.$api = apiClient; // 将 API 挂载到 Vue 实例
+
+import moment from 'moment'; // 引入 moment
+Vue.prototype.$moment = moment;// 将 moment 挂载到 Vue 原型上
 
 new Vue({
   store,

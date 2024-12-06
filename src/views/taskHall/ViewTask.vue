@@ -7,248 +7,192 @@
       <el-breadcrumb-item>查看任务</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 任务表格 -->
-    <el-table :data="pagedData" style="width: 100%">
-      <el-table-column label="序号" width="80">
-        <template slot-scope="scope">
-          {{ scope.$index + 1 + (currentPage - 1) * pageSize }}
-        </template>
-      </el-table-column>
+    <!-- 表格卡片 -->
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <span>查看任务</span>
+        <!-- 筛选条件区域 -->
+        <div class="filters">
+          <el-select
+            v-model="selectedSubmissionMethod"
+            multiple
+            placeholder="请选择提交方式"
+            style="width: 200px; margin-left: 20px"
+          >
+            <el-option
+              v-for="item in submissionMethods"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+          <el-select
+            v-model="selectedUrgency"
+            multiple
+            placeholder="请选择紧急程度"
+            style="width: 200px; margin-left: 20px"
+          >
+            <el-option
+              v-for="item in urgencyLevels"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </div>
+      </div>
 
-      <el-table-column label="任务名称">
-        <template slot-scope="scope">
-          {{ scope.row.taskName }}
-        </template>
-      </el-table-column>
+      <div class="task-table">
+        <el-table :data="pagedData" border style="width: 100%">
+          <el-table-column label="序号" width="90" align="center">
+            <template slot-scope="scope">
+              {{ scope.$index + 1 + (currentPage - 1) * pageSize }}
+            </template>
+          </el-table-column>
 
-      <el-table-column label="截止日期" width="180">
-        <template slot-scope="scope">
-          {{ scope.row.dueDate }}
-        </template>
-      </el-table-column>
+          <el-table-column label="任务名称" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.taskName }}
+            </template>
+          </el-table-column>
 
-      <el-table-column label="发布人" width="120">
-        <template slot-scope="scope">
-          {{ scope.row.publisher }}
-        </template>
-      </el-table-column>
+          <el-table-column label="截止日期" width="180" align="center">
+            <template slot-scope="scope">
+              {{ formatDate(scope.row.dueDate) }}
+            </template>
+          </el-table-column>
 
-      <el-table-column label="佣金" width="120">
-        <template slot-scope="scope"> {{ scope.row.commission }} 元 </template>
-      </el-table-column>
+          <el-table-column label="发布人" width="120" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.publisher }}
+            </template>
+          </el-table-column>
 
-      <el-table-column label="紧急程度" width="120">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.urgency === '高' ? 'danger' : 'info'">
-            {{ scope.row.urgency }}
-          </el-tag>
-        </template>
-      </el-table-column>
+          <el-table-column label="佣金" width="120" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.commission }} 元
+            </template>
+          </el-table-column>
 
-      <el-table-column label="操作" width="180">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="goToTaskDetail(scope.row)">
-            任务详情
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+          <el-table-column label="提交方式" width="120" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.submissionMethod }}
+            </template>
+          </el-table-column>
 
-    <!-- 分页 -->
-    <el-pagination
-      background
-      layout="prev, pager, next"
-      :total="totalItems"
-      :page-size="pageSize"
-      :current-page="currentPage"
-      @current-change="handlePageChange"
-    />
+          <el-table-column label="紧急程度" width="120" align="center">
+            <template slot-scope="scope">
+              <el-tag
+                :type="
+                  scope.row.urgency === '高'
+                    ? 'danger'
+                    : scope.row.urgency === '中'
+                    ? 'warning'
+                    : 'success'
+                "
+              >
+                {{ scope.row.urgency }}
+              </el-tag>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="操作" width="180" align="center">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="goToTaskDetail(scope.row)">
+                任务详情
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination-container">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="totalItems"
+          :page-size="pageSize"
+          :current-page="currentPage"
+          @current-change="handlePageChange"
+        />
+      </div>
+    </el-card>
   </div>
 </template>
-  
-  <script>
+
+
+<script>
 export default {
   data() {
     return {
-      totalItems: 1000, // 假设总数据项数为 1000
-      pageSize: 10, // 每页显示的任务数量
-      currentPage: 1, // 当前页码
-      tableData: [
-        {
-          taskName: "任务1",
-          dueDate: "2024-12-15",
-          publisher: "张三",
-          commission: 100,
-          urgency: "高",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务2",
-          dueDate: "2024-12-20",
-          publisher: "李四",
-          commission: 150,
-          urgency: "中",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务3",
-          dueDate: "2024-12-25",
-          publisher: "王五",
-          commission: 200,
-          urgency: "低",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务4",
-          dueDate: "2024-12-30",
-          publisher: "赵六",
-          commission: 120,
-          urgency: "高",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务5",
-          dueDate: "2025-01-10",
-          publisher: "孙七",
-          commission: 180,
-          urgency: "中",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务6",
-          dueDate: "2025-01-15",
-          publisher: "钱八",
-          commission: 220,
-          urgency: "低",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务7",
-          dueDate: "2025-02-01",
-          publisher: "吴九",
-          commission: 160,
-          urgency: "高",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务8",
-          dueDate: "2025-02-10",
-          publisher: "郑十",
-          commission: 140,
-          urgency: "中",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务9",
-          dueDate: "2025-03-01",
-          publisher: "冯十一",
-          commission: 250,
-          urgency: "低",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务10",
-          dueDate: "2025-03-10",
-          publisher: "陈十二",
-          commission: 300,
-          urgency: "高",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务11",
-          dueDate: "2025-04-01",
-          publisher: "林十三",
-          commission: 170,
-          urgency: "中",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务12",
-          dueDate: "2025-04-15",
-          publisher: "周十四",
-          commission: 130,
-          urgency: "低",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务13",
-          dueDate: "2025-05-01",
-          publisher: "吴十五",
-          commission: 190,
-          urgency: "高",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务14",
-          dueDate: "2025-05-10",
-          publisher: "郑十六",
-          commission: 160,
-          urgency: "中",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务15",
-          dueDate: "2025-06-01",
-          publisher: "冯十七",
-          commission: 250,
-          urgency: "低",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务16",
-          dueDate: "2025-06-10",
-          publisher: "陈十八",
-          commission: 280,
-          urgency: "高",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务17",
-          dueDate: "2025-07-01",
-          publisher: "林十九",
-          commission: 200,
-          urgency: "中",
-          isAccepted: false,
-        },
-        {
-          taskName: "任务18",
-          dueDate: "2025-07-10",
-          publisher: "周二十",
-          commission: 220,
-          urgency: "低",
-          isAccepted: false,
-        },
+      totalItems: 0, // 总任务数
+      pageSize: 8, // 每页任务数
+      currentPage: 1, // 当前页
+      selectedSubmissionMethod: [],
+      selectedUrgency: [],
+      submissionMethods: [
+        { value: "线上", label: "线上" },
+        { value: "线下", label: "线下" },
       ],
+      urgencyLevels: [
+        { value: "高", label: "高" },
+        { value: "中", label: "中" },
+        { value: "低", label: "低" },
+      ],
+      tableData: [], // 动态数据存放
     };
   },
   computed: {
-    // 根据当前页码和每页大小计算显示的数据
     pagedData() {
+      // 筛选条件
+      const filtered = this.tableData.filter((task) => {
+        const matchesSubmission =
+          this.selectedSubmissionMethod.length === 0 ||
+          this.selectedSubmissionMethod.includes(task.submissionMethod);
+        const matchesUrgency =
+          this.selectedUrgency.length === 0 ||
+          this.selectedUrgency.includes(task.urgency);
+        return matchesSubmission && matchesUrgency;
+      });
+
+      // 分页逻辑
       const start = (this.currentPage - 1) * this.pageSize;
       const end = this.currentPage * this.pageSize;
-      return this.tableData.slice(start, end);
+      return filtered.slice(start, end);
     },
   },
   methods: {
-    // 跳转到任务详情页
-    goToTaskDetail(task) {
-      this.$router.push({ name: "TaskDetail", params: { taskId: task.id } });
+    async fetchTasks() {
+      try {
+        const response = await this.$api.get("/view");
+        this.tableData = response.data; // 填充任务数据
+        this.totalItems = this.tableData.length; // 设置总任务数
+      } catch (error) {
+        console.error("获取任务列表失败", error);
+      }
     },
-    // 处理分页切换
+    formatDate(date) {
+      return this.$moment(date).format("YYYY-MM-DD");
+    },
+    goToTaskDetail(task) {
+      // 使用任务名称作为路由参数跳转
+      this.$router.push({
+        name: "TaskDetail",
+        params: { taskName: task.taskName },
+      });
+    },
     handlePageChange(page) {
       this.currentPage = page;
     },
   },
+  mounted() {
+    this.fetchTasks(); // 页面加载时获取任务数据
+  },
 };
 </script>
-  
-<style scoped>
-.view-task {
-  padding: 40px;
-  background-color: #fff;
-  position: relative;
-}
 
+<style scoped>
 .breadcrumb {
   position: sticky;
   top: 0;
@@ -257,17 +201,32 @@ export default {
   margin-bottom: 20px;
 }
 
-/* 增大每个面包屑项的字体 */
 .el-breadcrumb-item {
   font-size: 18px;
 }
 
-.el-table {
-  margin-top: 20px;
+.view-task {
+  padding: 40px;
+  background-color: #fff;
 }
 
-.el-pagination {
-  margin-top: 20px;
+.box-card {
+  padding: 20px;
+}
+
+.filters {
+  float: right;
+  display: flex;
+  align-items: center;
+  margin-top: -10px;
+}
+
+.task-table {
+  margin-bottom: 20px;
+}
+
+.pagination-container {
   text-align: right;
+  margin-top: 20px;
 }
 </style>

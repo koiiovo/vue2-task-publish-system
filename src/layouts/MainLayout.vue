@@ -221,9 +221,9 @@
             :aria-expanded="showMenu.toString()"
           >
             <ul>
-              <li role="menuitem" aria-label="资料设置">资料设置</li>
-              <li role="menuitem" aria-label="查看任务">查看任务</li>
-              <li role="menuitem" aria-label="查看佣金">查看佣金</li>
+              <li role="menuitem" aria-label="我的资料">我的资料</li>
+              <li role="menuitem" aria-label="我的任务">我的任务</li>
+              <li role="menuitem" aria-label="我的佣金">我的佣金</li>
               <li role="menuitem" aria-label="退出">退出</li>
             </ul>
           </div>

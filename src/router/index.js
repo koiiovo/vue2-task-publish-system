@@ -40,7 +40,7 @@ const routes = [
         component: () => import(/* webpackChunkName: "task" */ '@/views/taskHall/PublishTask.vue'),
       },
       {
-        path: 'task-detail/:taskId',  // 动态路由，接收任务 ID
+        path: 'task-detail/:taskName',  // 动态路由，接收任务 ID
         name: 'TaskDetail',
         component: () => import(/* webpackChunkName: "task" */ '@/views/taskHall/TaskDetail.vue'),
         props: true, // 将路由参数作为 props 传递给组件

@@ -43,6 +43,16 @@
           ></el-input>
         </el-form-item>
 
+        <el-form-item label="提交方式" prop="submissionMethod">
+          <el-select
+            v-model="taskForm.submissionMethod"
+            placeholder="请选择提交方式"
+          >
+            <el-option label="线上" value="线上"></el-option>
+            <el-option label="线下" value="线下"></el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="紧急程度" prop="urgency">
           <el-select v-model="taskForm.urgency" placeholder="请选择紧急程度">
             <el-option label="高" value="高"></el-option>
@@ -76,6 +86,7 @@ export default {
         taskName: "",
         dueDate: "",
         commission: "",
+        submissionMethod: "",
         urgency: "",
         description: "",
       },
@@ -89,6 +100,9 @@ export default {
         commission: [
           { required: true, message: "请输入佣金金额", trigger: "blur" },
         ],
+        submissionMethod: [
+          { required: true, message: "请选择提交方式", trigger: "change" },
+        ],
         urgency: [
           { required: true, message: "请选择紧急程度", trigger: "change" },
         ],
@@ -99,23 +113,87 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      this.$refs.taskForm.validate((valid) => {
-        if (valid) {
-          // 模拟提交任务数据，实际操作时需要发送到后端
-          this.$message.success("任务发布成功");
-          // 清空表单
-          this.resetForm();
-        } else {
-          this.$message.error("请完善表单信息");
-          return false;
-        }
-      });
-    },
-    resetForm() {
-      this.$refs.taskForm.resetFields();
-    },
+  handleSubmit() {
+    this.$refs.taskForm.validate((valid) => {
+      if (valid) {
+        const token = localStorage.getItem("token"); // 获取 token
+        const refreshToken = localStorage.getItem("refreshToken"); // 获取 refreshToken
+        console.log("当前 token: ", token); // 打印 token
+        console.log("任务数据: ", this.taskForm); // 打印任务数据
+
+        // 发送请求
+        this.$api
+          .post("/publish", this.taskForm, {
+            headers: {
+              Authorization: `Bearer ${token}`, // 使用 token 进行身份验证
+            },
+          })
+          .then((response) => {
+            console.log("发布任务成功: ", response); // 调试成功信息
+            this.$message.success("任务发布成功");
+            this.resetForm();
+          })
+          .catch((error) => {
+            if (error.response && error.response.status === 401) {
+              // 处理 Token 过期，使用 refreshToken 获取新的 Token
+              console.log("Token 过期，正在刷新 Token...");
+              this.refreshToken(refreshToken)
+                .then((newToken) => {
+                  // 刷新成功后，重新发起发布任务请求
+                  this.$api
+                    .post("/publish", this.taskForm, {
+                      headers: {
+                        Authorization: `Bearer ${newToken}`,
+                      },
+                    })
+                    .then((response) => {
+                      console.log("发布任务成功: ", response);
+                      this.$message.success("任务发布成功");
+                      this.resetForm();
+                    })
+                    .catch((error) => {
+                      console.log("发布任务失败:", error);
+                      this.$message.error("任务发布失败");
+                    });
+                })
+                .catch((error) => {
+                  console.log("刷新 Token 失败:", error);
+                  this.$message.error("令牌已过期，请重新登录");
+                  this.$router.push("/login"); // 跳转到登录页面
+                });
+            } else {
+              console.log("发布任务失败:", error);
+              this.$message.error("任务发布失败");
+            }
+          });
+      } else {
+        this.$message.error("请完善表单信息");
+        return false;
+      }
+    });
   },
+
+  // 刷新 Token 方法
+  refreshToken(refreshToken) {
+    return new Promise((resolve, reject) => {
+      this.$api
+        .post("/loginUser/refresh-token", { refreshToken }) // 使用 refreshToken 请求新的 accessToken
+        .then((response) => {
+          const newToken = response.data; // 获取新的 accessToken
+          localStorage.setItem("token", newToken); // 将新令牌存入 localStorage
+          resolve(newToken); // 返回新的 accessToken
+        })
+        .catch((error) => {
+          reject(error); // 如果刷新令牌失败，抛出错误
+        });
+    });
+  },
+
+  resetForm() {
+    this.$refs.taskForm.resetFields();
+  },
+},
+
 };
 </script>
 
@@ -128,7 +206,6 @@ export default {
   margin-bottom: 20px;
 }
 
-/* 增大每个面包屑项的字体 */
 .el-breadcrumb-item {
   font-size: 18px;
 }
