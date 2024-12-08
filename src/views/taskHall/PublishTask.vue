@@ -30,8 +30,9 @@
         <el-form-item label="截止日期" prop="dueDate">
           <el-date-picker
             v-model="taskForm.dueDate"
-            type="date"
+            type="datetime"
             placeholder="选择截止日期"
+            :picker-options="pickerOptions"
           ></el-date-picker>
         </el-form-item>
 
@@ -110,90 +111,95 @@ export default {
           { required: true, message: "请输入任务描述", trigger: "blur" },
         ],
       },
+      // 设置 picker 的选项，限制选择的日期不能早于当前时间
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now(); // 禁用当前时间之前的日期
+        }
+      }
     };
   },
   methods: {
-  handleSubmit() {
-    this.$refs.taskForm.validate((valid) => {
-      if (valid) {
-        const token = localStorage.getItem("token"); // 获取 token
-        const refreshToken = localStorage.getItem("refreshToken"); // 获取 refreshToken
-        console.log("当前 token: ", token); // 打印 token
-        console.log("任务数据: ", this.taskForm); // 打印任务数据
+    handleSubmit() {
+      this.$refs.taskForm.validate((valid) => {
+        if (valid) {
+          const token = localStorage.getItem("token"); // 获取 token
+          const refreshToken = localStorage.getItem("refreshToken"); // 获取 refreshToken
+          console.log("当前 token: ", token); // 打印 token
+          console.log("任务数据: ", this.taskForm); // 打印任务数据
 
-        // 发送请求
+          // 发送请求
+          this.$api
+            .post("/publish", this.taskForm, {
+              headers: {
+                Authorization: `Bearer ${token}`, // 使用 token 进行身份验证
+              },
+            })
+            .then((response) => {
+              console.log("发布任务成功: ", response); // 调试成功信息
+              this.$message.success("任务发布成功");
+              this.resetForm();
+            })
+            .catch((error) => {
+              if (error.response && error.response.status === 401) {
+                // 处理 Token 过期，使用 refreshToken 获取新的 Token
+                console.log("Token 过期，正在刷新 Token...");
+                this.refreshToken(refreshToken)
+                  .then((newToken) => {
+                    // 刷新成功后，重新发起发布任务请求
+                    this.$api
+                      .post("/publish", this.taskForm, {
+                        headers: {
+                          Authorization: `Bearer ${newToken}`,
+                        },
+                      })
+                      .then((response) => {
+                        console.log("发布任务成功: ", response);
+                        this.$message.success("任务发布成功");
+                        this.resetForm();
+                      })
+                      .catch((error) => {
+                        console.log("发布任务失败:", error);
+                        this.$message.error("任务发布失败");
+                      });
+                  })
+                  .catch((error) => {
+                    console.log("刷新 Token 失败:", error);
+                    this.$message.error("令牌已过期，请重新登录");
+                    this.$router.push("/login"); // 跳转到登录页面
+                  });
+              } else {
+                console.log("发布任务失败:", error);
+                this.$message.error("任务发布失败");
+              }
+            });
+        } else {
+          this.$message.error("请完善表单信息");
+          return false;
+        }
+      });
+    },
+
+    // 刷新 Token 方法
+    refreshToken(refreshToken) {
+      return new Promise((resolve, reject) => {
         this.$api
-          .post("/publish", this.taskForm, {
-            headers: {
-              Authorization: `Bearer ${token}`, // 使用 token 进行身份验证
-            },
-          })
+          .post("/loginUser/refresh-token", { refreshToken }) // 使用 refreshToken 请求新的 accessToken
           .then((response) => {
-            console.log("发布任务成功: ", response); // 调试成功信息
-            this.$message.success("任务发布成功");
-            this.resetForm();
+            const newToken = response.data; // 获取新的 accessToken
+            localStorage.setItem("token", newToken); // 将新令牌存入 localStorage
+            resolve(newToken); // 返回新的 accessToken
           })
           .catch((error) => {
-            if (error.response && error.response.status === 401) {
-              // 处理 Token 过期，使用 refreshToken 获取新的 Token
-              console.log("Token 过期，正在刷新 Token...");
-              this.refreshToken(refreshToken)
-                .then((newToken) => {
-                  // 刷新成功后，重新发起发布任务请求
-                  this.$api
-                    .post("/publish", this.taskForm, {
-                      headers: {
-                        Authorization: `Bearer ${newToken}`,
-                      },
-                    })
-                    .then((response) => {
-                      console.log("发布任务成功: ", response);
-                      this.$message.success("任务发布成功");
-                      this.resetForm();
-                    })
-                    .catch((error) => {
-                      console.log("发布任务失败:", error);
-                      this.$message.error("任务发布失败");
-                    });
-                })
-                .catch((error) => {
-                  console.log("刷新 Token 失败:", error);
-                  this.$message.error("令牌已过期，请重新登录");
-                  this.$router.push("/login"); // 跳转到登录页面
-                });
-            } else {
-              console.log("发布任务失败:", error);
-              this.$message.error("任务发布失败");
-            }
+            reject(error); // 如果刷新令牌失败，抛出错误
           });
-      } else {
-        this.$message.error("请完善表单信息");
-        return false;
-      }
-    });
-  },
+      });
+    },
 
-  // 刷新 Token 方法
-  refreshToken(refreshToken) {
-    return new Promise((resolve, reject) => {
-      this.$api
-        .post("/loginUser/refresh-token", { refreshToken }) // 使用 refreshToken 请求新的 accessToken
-        .then((response) => {
-          const newToken = response.data; // 获取新的 accessToken
-          localStorage.setItem("token", newToken); // 将新令牌存入 localStorage
-          resolve(newToken); // 返回新的 accessToken
-        })
-        .catch((error) => {
-          reject(error); // 如果刷新令牌失败，抛出错误
-        });
-    });
+    resetForm() {
+      this.$refs.taskForm.resetFields();
+    },
   },
-
-  resetForm() {
-    this.$refs.taskForm.resetFields();
-  },
-},
-
 };
 </script>
 

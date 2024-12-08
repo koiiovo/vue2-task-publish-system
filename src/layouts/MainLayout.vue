@@ -4,7 +4,7 @@
     <div class="sidebar">
       <!-- Logo 和标题容器 -->
       <div class="logo-container">
-        <img src="@/assets/logo.png" alt="Logo" class="logo" />
+        <img src="@/assets/fa.png" alt="Logo" class="logo" />
         <h2>花开富贵派单平台</h2>
       </div>
 
@@ -13,7 +13,7 @@
         <nav role="navigation">
           <ul>
             <!-- 首页菜单 -->
-            <li role="menuitem" aria-label="首页" class="home-menu">
+            <li role="menuitem" aria-label="首页" @click.stop="navigateTo('/')">
               <font-awesome-icon icon="fas fa-home" />
               首页
             </li>
@@ -71,6 +71,7 @@
                   role="menuitem"
                   aria-label="进行中任务"
                   class="submenu-item"
+                  @click.stop="navigateTo('/my-task/ongoing')"
                 >
                   进行中任务
                 </li>
@@ -78,6 +79,7 @@
                   role="menuitem"
                   aria-label="审核中任务"
                   class="submenu-item"
+                  @click.stop="navigateTo('/my-task/reviewing')"
                 >
                   审核中任务
                 </li>
@@ -85,19 +87,15 @@
                   role="menuitem"
                   aria-label="已完成任务"
                   class="submenu-item"
+                  @click.stop="navigateTo('/my-task/completed')"
                 >
                   已完成任务
                 </li>
                 <li
                   role="menuitem"
-                  aria-label="已完成任务"
-                  class="submenu-item"
-                >
-                  已完成任务
-                </li>          <li
-                  role="menuitem"
                   aria-label="已发布任务"
                   class="submenu-item"
+                  @click.stop="navigateTo('/my-task/published')"
                 >
                   已发布任务
                 </li>
@@ -119,7 +117,12 @@
                 :class="{ rotated: subMenu.myTeam }"
               />
               <ul v-show="subMenu.myTeam">
-                <li role="menuitem" aria-label="成员列表" class="submenu-item">
+                <li
+                  role="menuitem"
+                  aria-label="成员列表"
+                  class="submenu-item"
+                  @click.stop="navigateTo('/my-team/members')"
+                >
                   成员列表
                 </li>
               </ul>
@@ -129,24 +132,39 @@
             <li
               role="menuitem"
               aria-label="交流圈子"
-              @click="toggleSubMenu('communication')"
-              :class="{ active: subMenu.communication }"
+              @click="toggleSubMenu('circle')"
+              :class="{ active: subMenu.circle }"
             >
               <font-awesome-icon icon="fas fa-comments" />
               交流圈子
               <font-awesome-icon
                 icon="fas fa-angle-down"
                 class="arrow-icon"
-                :class="{ rotated: subMenu.communication }"
+                :class="{ rotated: subMenu.circle }"
               />
-              <ul v-show="subMenu.communication">
-                <li role="menuitem" aria-label="讨论区" class="submenu-item">
+              <ul v-show="subMenu.circle">
+                <li
+                  role="menuitem"
+                  aria-label="讨论区"
+                  class="submenu-item"
+                  @click.stop="navigateTo('/circle/discussion')"
+                >
                   讨论区
                 </li>
-                <li role="menuitem" aria-label="我的消息" class="submenu-item">
+                <li
+                  role="menuitem"
+                  aria-label="我的消息"
+                  class="submenu-item"
+                  @click.stop="navigateTo('/circle/messages')"
+                >
                   我的消息
                 </li>
-                <li role="menuitem" aria-label="问题反馈" class="submenu-item">
+                <li
+                  role="menuitem"
+                  aria-label="问题反馈"
+                  class="submenu-item"
+                  @click.stop="navigateTo('/circle/feedback')"
+                >
                   问题反馈
                 </li>
               </ul>
@@ -167,10 +185,20 @@
                 :class="{ rotated: subMenu.systemManagement }"
               />
               <ul v-show="subMenu.systemManagement">
-                <li role="menuitem" aria-label="用户信息" class="submenu-item">
+                <li
+                  role="menuitem"
+                  aria-label="用户信息"
+                  class="submenu-item"
+                  @click.stop="navigateTo('/system-management/user-info')"
+                >
                   用户信息
                 </li>
-                <li role="menuitem" aria-label="系统设置" class="submenu-item">
+                <li
+                  role="menuitem"
+                  aria-label="系统设置"
+                  class="submenu-item"
+                  @click.stop="navigateTo('/system-management/settings')"
+                >
                   系统设置
                 </li>
               </ul>
@@ -224,7 +252,13 @@
               <li role="menuitem" aria-label="我的资料">我的资料</li>
               <li role="menuitem" aria-label="我的任务">我的任务</li>
               <li role="menuitem" aria-label="我的佣金">我的佣金</li>
-              <li role="menuitem" aria-label="退出">退出</li>
+              <li
+                role="menuitem"
+                aria-label="退出"
+                @click="navigateTo('/login')"
+              >
+                退出
+              </li>
             </ul>
           </div>
         </transition>
@@ -237,7 +271,7 @@
 export default {
   data() {
     return {
-      showMenu: false, // 控制用户菜单显示的状态
+      showMenu: false,
       subMenu: {
         taskHall: false,
         myTasks: false,
@@ -248,7 +282,6 @@ export default {
     };
   },
   methods: {
-    // 控制子菜单的显示与隐藏
     toggleSubMenu(menu) {
       this.$set(this.subMenu, menu, !this.subMenu[menu]);
     },
@@ -263,6 +296,10 @@ export default {
 </script>
 
 <style scoped>
+h2 {
+  font-family: "Ma Shan Zheng", cursive;
+}
+
 .main-layout {
   display: flex;
 }
@@ -277,26 +314,25 @@ export default {
   right: 0;
 }
 
-
 /* 整体容器 */
 .sidebar {
   display: flex;
   flex-direction: column;
   width: 300px;
-  height: 100vh; /* 保证侧边栏高度充满视口 */
+  height: 100vh;
   padding: 10px 0;
-  position: fixed; /* 固定在页面左侧 */
+  position: fixed;
   top: 0;
   left: 0;
-  margin: 0; /* 移除外边距 */
+  margin: 0;
 }
 
 /* Logo 和标题容器 */
 .logo-container {
   display: flex;
   align-items: center;
-  padding: 15px 15px;
-  margin-bottom: 15px;
+  padding: 15px 10px;
+  margin-bottom: 10px;
   width: 100%;
 }
 
@@ -307,8 +343,8 @@ export default {
 }
 
 .logo-container h2 {
-  font-size: 25px;
-  color: #333;
+  font-size: 28px;
+  color: #000000;
   font-weight: bold;
   margin: 0;
   letter-spacing: 1px;
@@ -319,26 +355,13 @@ export default {
 /* 导航栏样式 */
 .navigation {
   flex-grow: 1;
-  background: linear-gradient(180deg, #2e3b4e, #2c3e50);
+  background: linear-gradient(180deg, #ffc0d4, #ffb8b0);
   border-radius: 0 100px 0 0;
   padding: 25px 15px;
   box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.1);
   width: 60%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6), 0 15px 30px rgba(0, 0, 0, 0.6);
-}
-
-/* 首页菜单的正常状态 */
-.home-menu {
-  border-radius: 0 100px 0 0;
-  transition: all 0.3s ease;
-}
-
-/* 首页菜单悬浮时的效果 */
-.home-menu:hover {
-  background-color: #1d2a3a;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
-  transform: translateX(5px);
-  border-radius: 0 80px 0 0; /* 让悬浮效果有一个略小的半圆效果 */
+  box-shadow: 0 5px 15px rgba(255, 217, 217, 0.6),
+    0 15px 30px rgba(176, 149, 149, 0.6);
 }
 
 .navigation nav ul {
@@ -351,7 +374,7 @@ export default {
 .navigation nav ul li {
   padding: 15px 10px;
   cursor: pointer;
-  color: #fff;
+  color: #000000;
   font-size: 16px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease,
     transform 0.2s ease;
@@ -388,7 +411,7 @@ export default {
 }
 
 .submenu-item:hover {
-  background-color: #1d2a3a;
+  background-color: #ffcbcb;
 }
 
 .navigation nav ul li > ul {

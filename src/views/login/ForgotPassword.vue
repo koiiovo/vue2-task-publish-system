@@ -130,7 +130,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('D:/Web前端/task-publishing-system/src/assets/chi.jpg');
+    background-image: url('@/assets/chi.jpg');
     background-size: cover;
     background-position: center;
     filter: blur(10px);

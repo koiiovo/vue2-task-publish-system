@@ -1,45 +1,14 @@
 <template>
   <div class="view-task">
-    <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
       <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>任务大厅</el-breadcrumb-item>
-      <el-breadcrumb-item>查看任务</el-breadcrumb-item>
+      <el-breadcrumb-item>我的任务</el-breadcrumb-item>
+      <el-breadcrumb-item>已发布任务</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 表格卡片 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>查看任务</span>
-        <!-- 筛选条件区域 -->
-        <div class="filters">
-          <el-select
-            v-model="selectedSubmissionMethod"
-            multiple
-            placeholder="请选择提交方式"
-            style="width: 200px; margin-left: 20px"
-          >
-            <el-option
-              v-for="item in submissionMethods"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-          <el-select
-            v-model="selectedUrgency"
-            multiple
-            placeholder="请选择紧急程度"
-            style="width: 200px; margin-left: 20px"
-          >
-            <el-option
-              v-for="item in urgencyLevels"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </div>
+        <span>已发布任务</span>
       </div>
 
       <div class="task-table">
@@ -61,10 +30,10 @@
               {{ formatDate(scope.row.dueDate) }}
             </template>
           </el-table-column>
-
-          <el-table-column label="发布人" width="150" align="center">
+          
+          <el-table-column label="接单人" width="150" align="center">
             <template slot-scope="scope">
-              {{ scope.row.publisher }}
+              {{ scope.row.assignee || "暂无接单人" }}
             </template>
           </el-table-column>
 
@@ -106,7 +75,6 @@
         </el-table>
       </div>
 
-      <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
           background
@@ -120,54 +88,30 @@
     </el-card>
   </div>
 </template>
-
-
-<script>
+  
+  <script>
 export default {
   data() {
     return {
-      totalItems: 0, // 总任务数
-      pageSize: 8, // 每页任务数
-      currentPage: 1, // 当前页
-      selectedSubmissionMethod: [],
-      selectedUrgency: [],
-      submissionMethods: [
-        { value: "线上", label: "线上" },
-        { value: "线下", label: "线下" },
-      ],
-      urgencyLevels: [
-        { value: "高", label: "高" },
-        { value: "中", label: "中" },
-        { value: "低", label: "低" },
-      ],
+      totalItems: 0,
+      pageSize: 8,
+      currentPage: 1,
       tableData: [], // 动态数据存放
     };
   },
   computed: {
     pagedData() {
-      // 筛选条件
-      const filtered = this.tableData.filter((task) => {
-        const matchesSubmission =
-          this.selectedSubmissionMethod.length === 0 ||
-          this.selectedSubmissionMethod.includes(task.submissionMethod);
-        const matchesUrgency =
-          this.selectedUrgency.length === 0 ||
-          this.selectedUrgency.includes(task.urgency);
-        return matchesSubmission && matchesUrgency;
-      });
-
-      // 分页逻辑
       const start = (this.currentPage - 1) * this.pageSize;
       const end = this.currentPage * this.pageSize;
-      return filtered.slice(start, end);
+      return this.tableData.slice(start, end);
     },
   },
   methods: {
     async fetchTasks() {
       try {
-        const response = await this.$api.get("/view");
-        this.tableData = response.data; // 填充任务数据
-        this.totalItems = this.tableData.length; // 设置总任务数
+        const response = await this.$api.get("/ongoing");
+        this.tableData = response.data;
+        this.totalItems = this.tableData.length;
       } catch (error) {
         console.error("获取任务列表失败", error);
       }
@@ -176,7 +120,6 @@ export default {
       return this.$moment(date).format("YYYY-MM-DD");
     },
     goToTaskDetail(task) {
-      // 使用任务名称作为路由参数跳转
       this.$router.push({
         name: "TaskDetail",
         params: { taskName: task.taskName },
@@ -187,11 +130,11 @@ export default {
     },
   },
   mounted() {
-    this.fetchTasks(); // 页面加载时获取任务数据
+    this.fetchTasks();
   },
 };
 </script>
-
+  
 <style scoped>
 .breadcrumb {
   position: sticky;

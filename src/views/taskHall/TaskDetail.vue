@@ -187,7 +187,7 @@ export default {
   white-space: pre-wrap;
   word-wrap: break-word;
   max-height: 202px; /* 限制最大高度 */
-  overflow-y: auto; /* 超过时显示垂直滚动条 */
+  overflow-y: auto;
   font-size: 14px;
   color: #333;
   line-height: 1.5;
@@ -212,7 +212,7 @@ export default {
   padding: 0;
   border-radius: 5px;
   font-size: 16px;
-  background-color: #34b4a7;
+  background-color: #fcb7c1b2;
   color: #fff;
   height: auto;
   display: inline-flex;
