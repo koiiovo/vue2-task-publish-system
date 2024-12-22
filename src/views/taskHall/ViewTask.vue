@@ -165,7 +165,7 @@ export default {
   methods: {
     async fetchTasks() {
       try {
-        const response = await this.$api.get("/view");
+        const response = await this.$api.get("/task/view");
         this.tableData = response.data; // 填充任务数据
         this.totalItems = this.tableData.length; // 设置总任务数
       } catch (error) {

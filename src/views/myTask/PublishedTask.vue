@@ -1,14 +1,15 @@
 <template>
   <div class="view-task">
+    <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
       <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
-      <el-breadcrumb-item>已发布任务</el-breadcrumb-item>
+      <el-breadcrumb-item>已完成任务</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>已发布任务</span>
+        <span>已完成任务</span>
       </div>
 
       <div class="task-table">
@@ -30,10 +31,10 @@
               {{ formatDate(scope.row.dueDate) }}
             </template>
           </el-table-column>
-          
+
           <el-table-column label="接单人" width="150" align="center">
             <template slot-scope="scope">
-              {{ scope.row.assignee || "暂无接单人" }}
+              {{ scope.row.assignee }}
             </template>
           </el-table-column>
 
@@ -88,15 +89,16 @@
     </el-card>
   </div>
 </template>
-  
-  <script>
+
+<script>
 export default {
   data() {
     return {
       totalItems: 0,
       pageSize: 8,
       currentPage: 1,
-      tableData: [], // 动态数据存放
+      tableData: [],
+      status: "已发布", // 当前状态，您可以根据需要动态切换
     };
   },
   computed: {
@@ -109,11 +111,29 @@ export default {
   methods: {
     async fetchTasks() {
       try {
-        const response = await this.$api.get("/ongoing");
-        this.tableData = response.data;
-        this.totalItems = this.tableData.length;
+        const token = localStorage.getItem("token"); // 从 localStorage 获取 token
+        if (!token) {
+          this.$message.error("请先登录");
+          return;
+        }
+
+        const response = await this.$api.get(`/my-task`, {
+          params: { status: this.status },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // 确保从 response.data.data 中获取任务列表
+        if (Array.isArray(response.data.data.tasks)) {
+          this.tableData = response.data.data.tasks;
+          this.totalItems = this.tableData.length;
+        } else {
+          this.$message.error("获取任务数据失败，返回数据格式不正确");
+        }
       } catch (error) {
-        console.error("获取任务列表失败", error);
+        console.error("请求错误:", error);
+        this.$message.error("获取任务数据失败");
       }
     },
     formatDate(date) {
@@ -134,7 +154,6 @@ export default {
   },
 };
 </script>
-  
 <style scoped>
 .breadcrumb {
   position: sticky;

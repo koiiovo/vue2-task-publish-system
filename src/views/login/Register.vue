@@ -6,30 +6,58 @@
     <!-- 注册表单容器 -->
     <div class="form-container">
       <!-- Logo 图片 -->
-      <img src="@/assets/logo.png" alt="Logo" class="logo" />
+      <img src="@/assets/fa.png" alt="Logo" class="logo" />
 
       <h2 class="form-title">注册</h2>
 
+      <!-- 用户名输入框 -->
+      <input type="text" v-model="username" placeholder="用户名" />
+
       <!-- 学号输入框，失去焦点时检查学号是否已存在 -->
-      <input type="text" v-model="studentId" placeholder="学号" @blur="checkStudentId" />
-      
+      <input
+        type="text"
+        v-model="studentId"
+        placeholder="学号"
+        @blur="checkStudentId"
+      />
+
       <!-- 姓名输入框 -->
       <input type="text" v-model="fullName" placeholder="姓名" />
-      
+
       <!-- 密码输入框，输入时触发密码一致性检查 -->
-      <input type="password" v-model="password" placeholder="密码" @input="checkPassword" />
-      
+      <input
+        type="password"
+        v-model="password"
+        placeholder="密码"
+        @input="checkPassword"
+      />
+
       <!-- 确认密码输入框，输入时触发密码一致性检查 -->
-      <input type="password" v-model="confirmPassword" placeholder="确认密码" @input="checkPassword" />
+      <input
+        type="password"
+        v-model="confirmPassword"
+        placeholder="确认密码"
+        @input="checkPassword"
+      />
 
       <!-- 如果密码不一致且确认密码框有值，显示错误提示 -->
-      <p v-if="passwordError && confirmPassword" class="error-message">密码不一致，请重新确认。</p>
-      
+      <p v-if="passwordError && confirmPassword" class="error-message">
+        密码不一致，请重新确认。
+      </p>
+
       <!-- 如果学号已存在，显示学号已存在的错误提示 -->
-      <p v-if="accountExists" class="error-message">该账号已存在，请换个学号。</p>
+      <p v-if="accountExists" class="error-message">
+        该账号已存在，请换个学号。
+      </p>
 
       <!-- 注册按钮，禁用状态：密码不一致或账号已存在时禁用 -->
-      <button @click="register" class="register-button" :disabled="passwordError || accountExists">注册</button>
+      <button
+        @click="register"
+        class="register-button"
+        :disabled="passwordError || accountExists"
+      >
+        注册
+      </button>
 
       <!-- 登录提示，点击跳转到登录页面 -->
       <p class="login-prompt">
@@ -44,50 +72,55 @@ export default {
   name: "Register", // 组件的名称
   data() {
     return {
-      studentId: "", // 存储学号
-      fullName: "", // 存储姓名
-      password: "", // 存储密码
-      confirmPassword: "", // 存储确认密码
-      passwordError: false, // 密码一致性错误标志
-      accountExists: false, // 账号是否已存在标志
-      registeredAccounts: ["123456", "654321"], // 模拟已注册的学号列表
+      username: "", // 用户名
+      studentId: "", // 学号
+      fullName: "", // 姓名
+      password: "", // 密码
+      confirmPassword: "", // 确认密码
+      passwordError: false, // 密码一致性错误
+      accountExists: false, // 是否已注册
     };
   },
   methods: {
-    /**
-     * 检查密码是否一致
-     * 只有在确认密码框有值时才进行一致性检查
-     */
     checkPassword() {
-      if (this.confirmPassword) { // 只有确认密码框不为空时，才进行一致性检查
-        this.passwordError = this.password !== this.confirmPassword; // 如果密码与确认密码不一致，设置错误标志为 true
-      }
+      this.passwordError = this.password !== this.confirmPassword;
     },
 
-    /**
-     * 检查学号是否已存在
-     * 当学号输入框失去焦点时调用
-     */
     checkStudentId() {
-      this.accountExists = this.registeredAccounts.includes(this.studentId); // 检查输入的学号是否在已注册学号列表中
+      this.$api
+        .get(`/loginUser/query?studentId=${this.studentId}`)
+        .then((response) => {
+          this.accountExists = response.data.exists;
+        });
     },
 
-    /**
-     * 注册操作
-     * 如果密码一致且账号未被注册，输出注册信息
-     */
     register() {
+      // 调用后端注册接口
       if (!this.passwordError && !this.accountExists) {
-        // 如果没有密码错误并且账号没有重复，执行注册逻辑
-        console.log("注册信息:", this.studentId, this.fullName);
-        // 你可以在这里调用注册 API 或者执行其他注册操作
-        // 比如清空表单或跳转到其他页面
+        this.$api
+          .post("/loginUser/register", {
+            username: this.username,
+            studentId: this.studentId,
+            fullName: this.fullName,
+            password: this.password,
+          })
+          .then((response) => {
+            console.log("注册成功:", response);
+            if (response.data.success) {
+              this.$router.push("/login"); // 注册成功后跳转到登录页面
+            } else {
+              alert("注册失败，请重试");
+            }
+          })
+          .catch((error) => {
+            console.error("注册失败:", error);
+            alert("注册失败，请重试");
+          });
       }
-    }
-  }
+    },
+  },
 };
 </script>
-
 <style scoped>
 /* 页面背景图层样式 */
 .register-page {
@@ -106,7 +139,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('D:/Web前端/task-publishing-system/src/assets/chi.jpg'); /* 背景图片路径 */
+  background-image: url("@/assets/chi.jpg"); /* 背景图片路径 */
   background-size: cover;
   background-position: center;
   filter: blur(10px); /* 设置背景模糊 */
@@ -128,15 +161,15 @@ export default {
 }
 
 .logo {
-  width: 35px;
-  height: 35px;
+  width: 45px;
+  height: 45px;
 }
 
 /* 表单标题样式 */
 .form-title {
   font-size: 22px;
   font-weight: bold;
-  color: white;
+  color: rgb(0, 0, 0);
   margin-bottom: 16px;
 }
 

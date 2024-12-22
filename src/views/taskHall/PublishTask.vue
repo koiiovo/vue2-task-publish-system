@@ -130,7 +130,7 @@ export default {
 
           // 发送请求
           this.$api
-            .post("/publish", this.taskForm, {
+            .post("/task/publish", this.taskForm, {
               headers: {
                 Authorization: `Bearer ${token}`, // 使用 token 进行身份验证
               },

@@ -100,7 +100,7 @@ export default {
   methods: {
     async fetchTaskDetail(taskName) {
       try {
-        const response = await this.$api.get(`/detail/${taskName}`);
+        const response = await this.$api.get(`/task/detail/${taskName}`);
         if (response && response.data) {
           this.task = response.data;
         } else {

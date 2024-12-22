@@ -6,7 +6,7 @@
     <!-- 登录表单容器 -->
     <div class="form-container">
       <!-- Logo 图片 -->
-      <img src="@/assets/logo.png" alt="Logo" class="logo" />
+      <img src="@/assets/fa.png" alt="Logo" class="logo" />
 
       <h2 class="form-title">登录</h2>
 
@@ -28,7 +28,7 @@
         <input
           type="text"
           v-model="usernameOrId"
-          :placeholder="isUserLogin ? '请输入账号' : '请输入管理员账号'"
+          :placeholder="isUserLogin ? '请输入用户名' : '请输入管理员用户名'"
         />
       </div>
 
@@ -78,7 +78,6 @@
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
   name: "Login",
@@ -104,8 +103,8 @@ export default {
       this.isUserLogin = isUser;
     },
     fetchUsers() {
-      axios
-        .get("http://localhost:8080/loginUser/query")
+      this.$api
+        .get("/loginUser/query")
         .then((response) => {
           this.users = response.data;
         })
@@ -152,8 +151,8 @@ export default {
       // 验证用户名和密码
       if (this.validateUsername() && this.validatePassword()) {
         // 登录请求
-        axios
-          .post("http://localhost:8080/loginUser/login", {
+        this.$api
+          .post("/loginUser/login", {
             username: this.usernameOrId,
             password: this.password,
           })
@@ -190,8 +189,8 @@ export default {
     },
     validateToken(token, refreshToken) {
       // 使用 Axios 调用后台接口，验证 token 是否有效
-      axios
-        .post("http://localhost:8080/loginUser/validate-token", { token })
+      this.$api
+        .post("/loginUser/validate-token", { token })
         .then((response) => {
           if (!response.data.valid) {
             console.log("令牌无效，尝试刷新令牌");
@@ -204,8 +203,8 @@ export default {
     },
     refreshToken(refreshToken) {
       // 刷新令牌的逻辑
-      axios
-        .post("http://localhost:8080/loginUser/refresh-token", {
+      this.$api
+        .post("/loginUser/refresh-token", {
           refreshToken,
         })
         .then((response) => {
@@ -247,7 +246,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("D:/Web前端/task-publishing-system/src/assets/chi.jpg");
+  background-image: url("@/assets/chi.jpg");
   background-size: cover;
   background-position: center;
   filter: blur(10px);
@@ -269,8 +268,8 @@ export default {
 }
 
 .logo {
-  width: 35px;
-  height: 35px;
+  width: 45px;
+  height: 45px;
 }
 
 .form-title {
