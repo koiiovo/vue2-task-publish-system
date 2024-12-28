@@ -41,7 +41,7 @@
           <el-card class="data-card">
             <div class="card-title">已赚取佣金</div>
             <div class="card-value">{{ commission }}</div>
-            <el-link class="view-link" @click="navigateTo('/my-tasks')">
+            <el-link class="view-link" @click="navigateTo('my-task/completed')">
               我的任务
             </el-link>
           </el-card>

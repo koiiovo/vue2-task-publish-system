@@ -51,9 +51,21 @@ const routes = [
         component: () => import('@/views/myTask/OngoingTask.vue'),
       },
       {
+        path: 'my-task/ongoing/detail/:taskName',  // 新的路由路径，用于显示进行中任务的详情
+        name: 'OngoingDetail',
+        component: () => import('@/views/myTask/OngoingDetail.vue'),
+        props: true,
+      },
+      {
         path: 'my-task/reviewing',
         name: 'ReviewingTasks',
         component: () => import('@/views/myTask/ReviewingTask.vue'),
+      },
+      {
+        path: 'my-task/reviewing/detail/:taskName',
+        name: 'ReviewingDetail',
+        component: () => import('@/views/myTask/ReviewingDetail.vue'),
+        props: true,
       },
       {
         path: 'my-task/completed',
@@ -61,9 +73,21 @@ const routes = [
         component: () => import('@/views/myTask/CompletedTask.vue'),
       },
       {
+        path: 'my-task/completed/detail/:taskName',
+        name: 'CompletedDetail',
+        component: () => import('@/views/myTask/CompletedDetail.vue'),
+        props: true,
+      },
+      {
         path: 'my-task/published',
         name: 'PublishedTasks',
         component: () => import('@/views/myTask/PublishedTask.vue'),
+      },
+      {
+        path: 'my-task/published/detail/:taskName',
+        name: 'PublishedDetail',
+        component: () => import('@/views/myTask/PublishedDetail.vue'),
+        props: true,
       },
       {
         path: 'my-team/members',
@@ -71,19 +95,19 @@ const routes = [
         component: () => import('@/views/myTeam/TeamMembers.vue'),
       },
       {
-        path: 'circle/discussion',
-        name: 'CircleDiscussion',
-        component: () => import('@/views/circle/Discussion.vue'),
+        path: 'my-message/inform',
+        name: 'Inform',
+        component: () => import('@/views/my-message/Inform.vue'),
       },
       {
-        path: 'circle/messages',
-        name: 'CircleMessages',
-        component: () => import('@/views/circle/Messages.vue'),
+        path: 'my-message/chat',
+        name: 'Chat',
+        component: () => import('@/views/my-message/Chat.vue'),
       },
       {
-        path: 'circle/feedback',
-        name: 'CircleFeedback',
-        component: () => import('@/views/circle/Feedback.vue'),
+        path: 'my-message/feedback',
+        name: 'Feedback',
+        component: () => import('@/views/my-message/Feedback.vue'),
       },
       {
         path: 'system-management/user-info',

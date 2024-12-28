@@ -141,7 +141,7 @@ export default {
     },
     goToTaskDetail(task) {
       this.$router.push({
-        name: "TaskDetail",
+        name: "OngoingDetail",
         params: { taskName: task.taskName },
       });
     },

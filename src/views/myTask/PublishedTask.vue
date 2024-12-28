@@ -141,7 +141,7 @@ export default {
     },
     goToTaskDetail(task) {
       this.$router.push({
-        name: "TaskDetail",
+        name: "PublishedDetail",
         params: { taskName: task.taskName },
       });
     },

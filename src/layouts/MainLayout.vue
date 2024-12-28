@@ -128,15 +128,15 @@
               </ul>
             </li>
 
-            <!-- 交流圈子菜单 -->
+            <!-- 我的消息菜单 -->
             <li
               role="menuitem"
-              aria-label="交流圈子"
+              aria-label="我的消息"
               @click="toggleSubMenu('circle')"
               :class="{ active: subMenu.circle }"
             >
               <font-awesome-icon icon="fas fa-comments" />
-              交流圈子
+              我的消息
               <font-awesome-icon
                 icon="fas fa-angle-down"
                 class="arrow-icon"
@@ -145,25 +145,25 @@
               <ul v-show="subMenu.circle">
                 <li
                   role="menuitem"
-                  aria-label="讨论区"
+                  aria-label="通知"
                   class="submenu-item"
-                  @click.stop="navigateTo('/circle/discussion')"
+                  @click.stop="navigateTo('/my-message/inform')"
                 >
-                  讨论区
+                  通知
                 </li>
                 <li
                   role="menuitem"
                   aria-label="我的消息"
                   class="submenu-item"
-                  @click.stop="navigateTo('/circle/messages')"
+                  @click.stop="navigateTo('/my-message/chat')"
                 >
-                  我的消息
+                  聊天
                 </li>
                 <li
                   role="menuitem"
                   aria-label="问题反馈"
                   class="submenu-item"
-                  @click.stop="navigateTo('/circle/feedback')"
+                  @click.stop="navigateTo('/my-message/feedback')"
                 >
                   问题反馈
                 </li>
