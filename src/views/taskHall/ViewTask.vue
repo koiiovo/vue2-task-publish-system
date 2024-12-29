@@ -13,19 +13,21 @@
         <span>查看任务</span>
         <!-- 筛选条件区域 -->
         <div class="filters">
+          <!-- 查看任务类型 -->
           <el-select
-            v-model="selectedSubmissionMethod"
-            multiple
-            placeholder="请选择提交方式"
+            v-model="selectedTaskView"
+            placeholder="请选择任务查看方式"
             style="width: 200px; margin-left: 20px"
           >
             <el-option
-              v-for="item in submissionMethods"
+              v-for="item in taskViewOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             ></el-option>
           </el-select>
+
+          <!-- 紧急程度筛选 -->
           <el-select
             v-model="selectedUrgency"
             multiple
@@ -62,7 +64,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="发布人" width="150" align="center">
+          <el-table-column label="发布人" width="160" align="center">
             <template slot-scope="scope">
               {{ scope.row.publisher }}
             </template>
@@ -122,6 +124,7 @@
 </template>
 
 
+
 <script>
 export default {
   data() {
@@ -129,11 +132,11 @@ export default {
       totalItems: 0, // 总任务数
       pageSize: 8, // 每页任务数
       currentPage: 1, // 当前页
-      selectedSubmissionMethod: [],
-      selectedUrgency: [],
-      submissionMethods: [
-        { value: "线上", label: "线上" },
-        { value: "线下", label: "线下" },
+      selectedTaskView: "all", // 默认查看所有任务
+      selectedUrgency: [], // 紧急程度筛选
+      taskViewOptions: [
+        { value: "all", label: "查看所有任务" },
+        { value: "pending", label: "查看待接单任务" },
       ],
       urgencyLevels: [
         { value: "高", label: "高" },
@@ -145,11 +148,11 @@ export default {
   },
   computed: {
     pagedData() {
-      // 筛选条件
+      // 筛选条件：查看待接单任务或查看所有任务
       const filtered = this.tableData.filter((task) => {
         const matchesSubmission =
-          this.selectedSubmissionMethod.length === 0 ||
-          this.selectedSubmissionMethod.includes(task.submissionMethod);
+          this.selectedTaskView === "all" ||
+          (this.selectedTaskView === "pending" && task.status === "已发布");
         const matchesUrgency =
           this.selectedUrgency.length === 0 ||
           this.selectedUrgency.includes(task.urgency);
@@ -162,6 +165,15 @@ export default {
       return filtered.slice(start, end);
     },
   },
+  watch: {
+    // 监听筛选条件，更新总任务数
+    selectedTaskView() {
+      this.updateTotalItems();
+    },
+    selectedUrgency() {
+      this.updateTotalItems();
+    },
+  },
   methods: {
     async fetchTasks() {
       try {
@@ -171,6 +183,19 @@ export default {
       } catch (error) {
         console.error("获取任务列表失败", error);
       }
+    },
+    updateTotalItems() {
+      // 重新计算筛选后的总任务数
+      const filtered = this.tableData.filter((task) => {
+        const matchesSubmission =
+          this.selectedTaskView === "all" ||
+          (this.selectedTaskView === "pending" && task.status === "已发布");
+        const matchesUrgency =
+          this.selectedUrgency.length === 0 ||
+          this.selectedUrgency.includes(task.urgency);
+        return matchesSubmission && matchesUrgency;
+      });
+      this.totalItems = filtered.length;
     },
     formatDate(date) {
       return this.$moment(date).format("YYYY-MM-DD");
@@ -187,10 +212,18 @@ export default {
     },
   },
   mounted() {
-    this.fetchTasks(); // 页面加载时获取任务数据
+    const queryParams = this.$route.query;
+    if (queryParams.taskView) {
+      this.selectedTaskView = queryParams.taskView;
+    }
+    if (queryParams.urgency) {
+      this.selectedUrgency = [queryParams.urgency];
+    }
+    this.fetchTasks();
   },
 };
 </script>
+
 
 <style scoped>
 .breadcrumb {

@@ -21,7 +21,10 @@
           <el-card class="data-card">
             <div class="card-title">待接单任务</div>
             <div class="card-value">{{ pendingTasks }}</div>
-            <el-link class="view-link" @click="navigateTo('/view-task')">
+            <el-link
+              class="view-link"
+              @click="navigateTo('/view-task', { taskView: 'pending' })"
+            >
               查看任务
             </el-link>
           </el-card>
@@ -31,7 +34,12 @@
           <el-card class="data-card">
             <div class="card-title">紧急任务总量</div>
             <div class="card-value">{{ urgentTasks }}</div>
-            <el-link class="view-link" @click="navigateTo('/view-task')">
+            <el-link
+              class="view-link"
+              @click="
+                navigateTo('/view-task', { taskView: 'pending', urgency: '高' })
+              "
+            >
               查看任务
             </el-link>
           </el-card>
@@ -91,10 +99,8 @@
     </el-card>
   </div>
 </template>
-  
-  
-  
-  <script>
+
+<script>
 export default {
   data() {
     return {
@@ -105,15 +111,14 @@ export default {
         require("@/assets/home_images/4.jpg"),
         require("@/assets/home_images/5.jpg"),
       ],
-      taskTotal: 100,
-      pendingTasks: 20,
-      urgentTasks: 10,
-      commission: 2000,
+      taskTotal: 0,
+      pendingTasks: 0,
+      urgentTasks: 0,
+      commission: 0,
       calendarValue: new Date(),
     };
   },
   computed: {
-    // 当前月份名称
     currentMonth() {
       const months = [
         "January",
@@ -135,14 +140,10 @@ export default {
         this.calendarValue.getFullYear()
       );
     },
-
-    // 当前日期所在周的日期
     currentWeekDates() {
       const currentDate = new Date(this.calendarValue);
       const startOfWeek = this.getStartOfWeek(currentDate);
       const weekDates = [];
-
-      // 获取当前周的所有日期
       for (let i = 0; i < 7; i++) {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
@@ -150,14 +151,10 @@ export default {
       }
       return weekDates;
     },
-
-    // 下一周的日期
     nextWeekDates() {
       const currentDate = new Date(this.calendarValue);
       const startOfNextWeek = this.getStartOfNextWeek(currentDate);
       const weekDates = [];
-
-      // 获取下一周的所有日期
       for (let i = 0; i < 7; i++) {
         const date = new Date(startOfNextWeek);
         date.setDate(startOfNextWeek.getDate() + i);
@@ -165,31 +162,46 @@ export default {
       }
       return weekDates;
     },
-
-    // 当前周的星期日到星期六
     weekDays() {
       return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     },
   },
+  mounted() {
+    this.fetchTaskStats();
+  },
   methods: {
-    navigateTo(path) {
-      if (this.$route.path !== path) {
-        this.$router.push(path);
-      }
+    navigateTo(path, queryParams = {}) {
+    if (this.$route.path !== path) {
+      this.$router.push({ path, query: queryParams });
+    }
+  },
+    fetchTaskStats() {
+      this.$api
+        .get("/task/stats", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((response) => {
+          const data = response.data.data;
+          this.taskTotal = data.taskTotal;
+          this.pendingTasks = data.pendingTasks;
+          this.urgentTasks = data.urgentTasks;
+          this.commission = data.commission;
+        })
+        .catch((error) => {
+          console.error("Failed to fetch task stats", error);
+        });
     },
     getStartOfWeek(date) {
       const day = date.getDay();
-      const diff = date.getDate() - day; // 获取星期日的日期
-      const startOfWeek = new Date(date.setDate(diff));
-      startOfWeek.setHours(0, 0, 0, 0); // 设置为00:00:00
-      return startOfWeek;
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+      return new Date(date.setDate(diff));
     },
     getStartOfNextWeek(date) {
       const day = date.getDay();
-      const diff = date.getDate() + (7 - day); // 获取下一周的星期日
-      const startOfNextWeek = new Date(date.setDate(diff));
-      startOfNextWeek.setHours(0, 0, 0, 0); // 设置为00:00:00
-      return startOfNextWeek;
+      const diff = date.getDate() - day + (day === 0 ? 1 : 8); // adjust when day is sunday
+      return new Date(date.setDate(diff));
     },
     isToday(date) {
       const today = new Date();

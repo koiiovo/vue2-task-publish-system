@@ -106,8 +106,13 @@ const routes = [
       },
       {
         path: 'my-message/feedback',
-        name: 'Feedback',
+        name: 'FeedbackList',
         component: () => import('@/views/my-message/Feedback.vue'),
+      }, {
+        path: '/my-message/feedback/:id',
+        name: 'FeedbackDetail',
+        component: () => import('@/views/my-message/FeedbackDetail.vue'),
+        props: true, // 允许将路由参数作为 props 传递给组件
       },
       {
         path: 'system-management/user-info',

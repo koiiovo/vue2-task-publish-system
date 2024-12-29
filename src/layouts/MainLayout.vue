@@ -249,9 +249,27 @@
             :aria-expanded="showMenu.toString()"
           >
             <ul>
-              <li role="menuitem" aria-label="我的资料">我的资料</li>
-              <li role="menuitem" aria-label="我的任务">我的任务</li>
-              <li role="menuitem" aria-label="我的佣金">我的佣金</li>
+              <li
+                role="menuitem"
+                aria-label="我的资料"
+                @click.stop="navigateTo('/system-management/user-info')"
+              >
+                我的资料
+              </li>
+              <li
+                role="menuitem"
+                aria-label="我的任务"
+                @click.stop="navigateTo('/my-task/published')"
+              >
+                我的任务
+              </li>
+              <li
+                role="menuitem"
+                aria-label="我的佣金"
+                @click.stop="navigateTo('/my-task/completed')"
+              >
+                我的佣金
+              </li>
               <li
                 role="menuitem"
                 aria-label="退出"

@@ -8,8 +8,10 @@
     </el-breadcrumb>
 
     <el-card class="box-card">
-      <div slot="header" class="clearfix">
+      <!-- 使用 flex 布局将标题和已赚取金额分开 -->
+      <div slot="header" class="header-container">
         <span>已完成任务</span>
+        <span class="earned-commission">已赚取：{{ totalEarned }} ￥</span>
       </div>
 
       <div class="task-table">
@@ -53,13 +55,7 @@
           <el-table-column label="紧急程度" width="110" align="center">
             <template slot-scope="scope">
               <el-tag
-                :type="
-                  scope.row.urgency === '高'
-                    ? 'danger'
-                    : scope.row.urgency === '中'
-                    ? 'warning'
-                    : 'success'
-                "
+                :type="scope.row.urgency === '高' ? 'danger' : scope.row.urgency === '中' ? 'warning' : 'success'"
               >
                 {{ scope.row.urgency }}
               </el-tag>
@@ -98,6 +94,7 @@ export default {
       pageSize: 8,
       currentPage: 1,
       tableData: [],
+      totalEarned: 0, // 用来保存总佣金
       status: "已完成", // 当前状态，您可以根据需要动态切换
     };
   },
@@ -128,6 +125,9 @@ export default {
         if (Array.isArray(response.data.data.tasks)) {
           this.tableData = response.data.data.tasks;
           this.totalItems = this.tableData.length; // 根据获取的数据更新总数
+
+          // 计算佣金总和
+          this.totalEarned = this.tableData.reduce((sum, task) => sum + parseFloat(task.commission), 0);
         } else {
           this.$message.error("获取任务数据失败，返回数据格式不正确");
         }
@@ -154,6 +154,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .breadcrumb {
   position: sticky;
@@ -190,5 +191,17 @@ export default {
 .pagination-container {
   text-align: right;
   margin-top: 20px;
+}
+
+/* 右上角佣金样式 */
+.header-container {
+  display: flex;
+  justify-content: space-between; /* 使标题和佣金金额分开 */
+  align-items: center;
+}
+
+.earned-commission {
+  font-size: 16px;
+  color: #67c23a;
 }
 </style>

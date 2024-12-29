@@ -4,12 +4,12 @@
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
       <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
-      <el-breadcrumb-item>已完成任务</el-breadcrumb-item>
+      <el-breadcrumb-item>已发布任务</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>已完成任务</span>
+        <span>已发布任务</span>
       </div>
 
       <div class="task-table">
