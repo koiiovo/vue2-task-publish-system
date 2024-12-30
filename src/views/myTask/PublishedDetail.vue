@@ -2,7 +2,7 @@
   <div class="task-detail">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/my-task/published' }">
         已发布任务
@@ -122,10 +122,8 @@ export default {
       }
     },
 
-    // 任务状态更新函数
     async handleApprove() {
       try {
-        // 调用后端 API 更新任务状态为已完成
         await this.$api.put(`/task/update-passed/${this.task.taskName}`);
         this.$message.success("任务已审核通过，状态已更新为已完成");
         // 更新任务状态
@@ -195,7 +193,7 @@ export default {
 .task-description {
   white-space: pre-wrap;
   word-wrap: break-word;
-  max-height: 202px; /* 限制最大高度 */
+  max-height: 202px;
   overflow-y: auto;
   font-size: 14px;
   color: #333;
@@ -210,22 +208,21 @@ export default {
 }
 
 .disabled-button {
-  background-color: #d3d3d3; /* 灰色背景 */
+  background-color: #d3d3d3;
   color: #fff;
-  border-color: #d3d3d3; /* 灰色边框 */
+  border-color: #d3d3d3;
 }
 
 .task-description {
   white-space: pre-wrap;
   word-wrap: break-word;
-  max-height: 202px; /* 限制最大高度 */
+  max-height: 202px;
   overflow-y: auto;
   font-size: 14px;
   color: #333;
   line-height: 1.5;
 }
 
-/* 返回按钮样式 */
 .back-btn {
   margin-right: 10px;
   padding: 0;

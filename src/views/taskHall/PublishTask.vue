@@ -2,7 +2,7 @@
   <div class="publish-task">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>任务大厅</el-breadcrumb-item>
       <el-breadcrumb-item>发布任务</el-breadcrumb-item>
     </el-breadcrumb>
@@ -115,8 +115,8 @@ export default {
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now(); // 禁用当前时间之前的日期
-        }
-      }
+        },
+      },
     };
   },
   methods: {
@@ -125,8 +125,8 @@ export default {
         if (valid) {
           const token = localStorage.getItem("token"); // 获取 token
           const refreshToken = localStorage.getItem("refreshToken"); // 获取 refreshToken
-          console.log("当前 token: ", token); // 打印 token
-          console.log("任务数据: ", this.taskForm); // 打印任务数据
+          console.log("当前 token: ", token);
+          console.log("任务数据: ", this.taskForm);
 
           // 发送请求
           this.$api
@@ -136,7 +136,7 @@ export default {
               },
             })
             .then((response) => {
-              console.log("发布任务成功: ", response); // 调试成功信息
+              console.log("发布任务成功: ", response);
               this.$message.success("任务发布成功");
               this.resetForm();
             })
@@ -166,7 +166,7 @@ export default {
                   .catch((error) => {
                     console.log("刷新 Token 失败:", error);
                     this.$message.error("令牌已过期，请重新登录");
-                    this.$router.push("/login"); // 跳转到登录页面
+                    this.$router.push("/"); // 跳转到登录页面
                   });
               } else {
                 console.log("发布任务失败:", error);
@@ -184,14 +184,14 @@ export default {
     refreshToken(refreshToken) {
       return new Promise((resolve, reject) => {
         this.$api
-          .post("/loginUser/refresh-token", { refreshToken }) // 使用 refreshToken 请求新的 accessToken
+          .post("/loginUser/refresh-token", { refreshToken })
           .then((response) => {
-            const newToken = response.data; // 获取新的 accessToken
-            localStorage.setItem("token", newToken); // 将新令牌存入 localStorage
-            resolve(newToken); // 返回新的 accessToken
+            const newToken = response.data;
+            localStorage.setItem("token", newToken);
+            resolve(newToken);
           })
           .catch((error) => {
-            reject(error); // 如果刷新令牌失败，抛出错误
+            reject(error);
           });
       });
     },

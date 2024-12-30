@@ -1,6 +1,5 @@
 <template>
   <div class="register-page">
-    <!-- 背景图层 -->
     <div class="background"></div>
 
     <!-- 注册表单容器 -->
@@ -21,8 +20,8 @@
         @blur="checkStudentId"
       />
 
-      <!-- 姓名输入框 -->
-      <input type="text" v-model="fullName" placeholder="姓名" />
+      <!-- 真实姓名输入框 -->
+      <input type="text" v-model="fullName" placeholder="真实姓名" />
 
       <!-- 密码输入框，输入时触发密码一致性检查 -->
       <input
@@ -40,12 +39,10 @@
         @input="checkPassword"
       />
 
-      <!-- 如果密码不一致且确认密码框有值，显示错误提示 -->
       <p v-if="passwordError && confirmPassword" class="error-message">
         密码不一致，请重新确认。
       </p>
 
-      <!-- 如果学号已存在，显示学号已存在的错误提示 -->
       <p v-if="accountExists" class="error-message">
         该账号已存在，请换个学号。
       </p>
@@ -61,7 +58,7 @@
 
       <!-- 登录提示，点击跳转到登录页面 -->
       <p class="login-prompt">
-        已有账号？<router-link to="/login">登录</router-link>
+        已有账号？<router-link to="/">登录</router-link>
       </p>
     </div>
   </div>
@@ -69,16 +66,16 @@
 
 <script>
 export default {
-  name: "Register", // 组件的名称
+  name: "Register",
   data() {
     return {
-      username: "", // 用户名
-      studentId: "", // 学号
-      fullName: "", // 姓名
-      password: "", // 密码
-      confirmPassword: "", // 确认密码
-      passwordError: false, // 密码一致性错误
-      accountExists: false, // 是否已注册
+      username: "",
+      studentId: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
+      passwordError: false,
+      accountExists: false,
     };
   },
   methods: {
@@ -95,7 +92,6 @@ export default {
     },
 
     register() {
-      // 调用后端注册接口
       if (!this.passwordError && !this.accountExists) {
         this.$api
           .post("/loginUser/register", {
@@ -107,7 +103,7 @@ export default {
           .then((response) => {
             console.log("注册成功:", response);
             if (response.data.success) {
-              this.$router.push("/login"); // 注册成功后跳转到登录页面
+              this.$router.push("/");
             } else {
               alert("注册失败，请重试");
             }
@@ -122,7 +118,6 @@ export default {
 };
 </script>
 <style scoped>
-/* 页面背景图层样式 */
 .register-page {
   display: flex;
   justify-content: center;
@@ -132,7 +127,6 @@ export default {
   position: relative;
 }
 
-/* 背景图样式 */
 .background {
   position: absolute;
   top: 0;
@@ -143,21 +137,21 @@ export default {
   background-size: cover;
   background-position: center;
   filter: blur(10px); /* 设置背景模糊 */
-  z-index: -1; /* 背景位于最底层 */
+  z-index: -1;
 }
 
 /* 注册表单容器样式 */
 .form-container {
-  width: 320px; /* 设置表单容器的宽度 */
+  width: 320px;
   padding: 40px;
   background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* 为表单容器加上阴影 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   display: flex;
-  flex-direction: column; /* 让表单元素垂直排列 */
-  align-items: center; /* 水平居中对齐 */
-  gap: 12px; /* 元素之间的间隙 */
-  z-index: 1; /* 使表单处于背景之上 */
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
 }
 
 .logo {
@@ -175,29 +169,29 @@ export default {
 
 /* 输入框样式 */
 .form-container input {
-  width: 92%; /* 输入框宽度 */
+  width: 92%;
   padding: 12px;
-  border-radius: 25px; /* 圆角效果 */
-  border: none; /* 去除边框 */
-  background: rgba(255, 255, 255, 0.9); /* 背景半透明 */
+  border-radius: 25px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* 注册按钮样式 */
 .register-button {
-  width: 100%; /* 注册按钮宽度填充父容器 */
+  width: 100%;
   padding: 12px;
   border-radius: 25px;
-  background-color: #000000; /* 按钮背景色 */
-  color: white; /* 按钮文字颜色 */
+  background-color: #000000;
+  color: white;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
-  border: none; /* 去除按钮边框 */
+  border: none;
 }
 
 /* 注册按钮的悬浮状态 */
 .register-button:hover {
-  background-color: #333; /* 鼠标悬浮时按钮颜色变暗 */
+  background-color: #333;
 }
 
 /* 登录提示样式 */
@@ -208,13 +202,13 @@ export default {
 
 /* 登录提示链接样式 */
 .login-prompt a {
-  color: #00bfff; /* 设置链接的颜色 */
-  text-decoration: none; /* 去除链接的下划线 */
+  color: #00bfff;
+  text-decoration: none;
 }
 
 /* 错误提示样式 */
 .error-message {
   font-size: 12px;
-  color: red; /* 设置错误信息的字体颜色 */
+  color: red;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="view-task">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
       <el-breadcrumb-item>审核中任务</el-breadcrumb-item>
     </el-breadcrumb>
@@ -13,7 +13,13 @@
       </div>
 
       <div class="task-table">
-        <el-table :data="pagedData" border style="width: 100%">
+        <!-- 判断是否有任务 -->
+        <el-table
+          v-if="tableData.length > 0"
+          :data="pagedData"
+          border
+          style="width: 100%"
+        >
           <el-table-column label="序号" width="100" align="center">
             <template slot-scope="scope">
               {{ scope.$index + 1 + (currentPage - 1) * pageSize }}
@@ -74,6 +80,16 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <!-- 没有任务时的提示 -->
+        <div v-else class="no-tasks">
+          <el-alert
+            title="您目前没有任务正在审核中"
+            type="warning"
+            center
+            class="alert-message"
+          />
+        </div>
       </div>
 
       <div class="pagination-container">
@@ -98,7 +114,7 @@ export default {
       pageSize: 8,
       currentPage: 1,
       tableData: [],
-      status: "审核中", // 当前状态，您可以根据需要动态切换
+      status: "审核中", // 当前状态
     };
   },
   computed: {
@@ -111,7 +127,7 @@ export default {
   methods: {
     async fetchTasks() {
       try {
-        const token = localStorage.getItem("token"); // 从 localStorage 获取 token
+        const token = localStorage.getItem("token");
         if (!token) {
           this.$message.error("请先登录");
           return;
@@ -124,12 +140,11 @@ export default {
           },
         });
 
-        // 确保从 response.data.data 中获取任务列表
         if (Array.isArray(response.data.data.tasks)) {
           this.tableData = response.data.data.tasks;
-          this.totalItems = this.tableData.length; // 根据获取的数据更新总数
+          this.totalItems = this.tableData.length;
         } else {
-          this.$message.error("获取任务数据失败，返回数据格式不正确");
+          this.$message.error("暂无任务");
         }
       } catch (error) {
         console.error("请求错误:", error);
@@ -154,6 +169,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .breadcrumb {
   position: sticky;
@@ -190,5 +206,20 @@ export default {
 .pagination-container {
   text-align: right;
   margin-top: 20px;
+}
+
+.no-tasks {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.alert-message {
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #fbf3fb;
+  color: #e1a3ba;
+  border: 1px solid #ebdddd;
+  padding: 10px;
+  border-radius: 5px;
 }
 </style>

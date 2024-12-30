@@ -6,7 +6,7 @@ Vue.use(Router);
 
 const routes = [
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     component: () => import('../views/login/Login.vue'),
   },
@@ -25,7 +25,7 @@ const routes = [
     component: MainLayout,
     children: [
       {
-        path: '', // 默认子路由
+        path: 'home', // 默认子路由
         name: 'Home',
         component: () => import('@/views/Home.vue'),
       },
@@ -89,21 +89,7 @@ const routes = [
         component: () => import('@/views/myTask/PublishedDetail.vue'),
         props: true,
       },
-      {
-        path: 'my-team/members',
-        name: 'TeamMembers',
-        component: () => import('@/views/myTeam/TeamMembers.vue'),
-      },
-      {
-        path: 'my-message/inform',
-        name: 'Inform',
-        component: () => import('@/views/my-message/Inform.vue'),
-      },
-      {
-        path: 'my-message/chat',
-        name: 'Chat',
-        component: () => import('@/views/my-message/Chat.vue'),
-      },
+      
       {
         path: 'my-message/feedback',
         name: 'FeedbackList',
@@ -114,6 +100,12 @@ const routes = [
         component: () => import('@/views/my-message/FeedbackDetail.vue'),
         props: true, // 允许将路由参数作为 props 传递给组件
       },
+      {
+        path: 'my-message/feedback/submit', // 新增路由，指向反馈提交页面
+        name: 'SubmitFeedback',
+        component: () => import('@/views/my-message/SubmitFeedback.vue'),
+      },
+
       {
         path: 'system-management/user-info',
         name: 'UserInfo',

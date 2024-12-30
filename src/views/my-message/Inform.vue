@@ -2,7 +2,7 @@
   <div class="view-task">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的消息</el-breadcrumb-item>
       <el-breadcrumb-item>通知</el-breadcrumb-item>
     </el-breadcrumb>

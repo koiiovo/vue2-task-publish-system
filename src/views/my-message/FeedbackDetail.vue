@@ -1,18 +1,27 @@
 <template>
-  <div class="submit-response-page">
+  <div class="view-response-page">
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
-      <el-breadcrumb-item to="/my-feedback">我的反馈</el-breadcrumb-item>
-      <el-breadcrumb-item>提交回复</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/my-message/feedback"
+        >问题反馈</el-breadcrumb-item
+      >
+      <el-breadcrumb-item>查看详情</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <!-- 反馈信息展示 -->
+    <!-- 返回按钮和标题 -->
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <span>反馈详情</span>
+        <el-button
+          icon="el-icon-arrow-left"
+          size="mini"
+          @click="$router.push('/my-message/feedback')"
+          class="back-btn"
+        ></el-button>
+        <span>问题详情</span>
       </div>
 
+      <!-- 反馈信息展示 -->
       <div class="feedback-detail">
         <el-row>
           <el-col :span="6"><strong>问题标题：</strong></el-col>
@@ -34,7 +43,28 @@
     </el-card>
 
     <!-- 回复区 -->
-    <el-card class="box-card reply-card">
+    <el-card v-if="feedback.response" class="box-card reply-card">
+      <div slot="header" class="clearfix">
+        <span>回复内容</span>
+      </div>
+      <div class="response-detail">
+        <el-row>
+          <el-col :span="6"><strong>回复人：</strong></el-col>
+          <el-col :span="18">{{ feedback.responseUser }}</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6"><strong>回复时间：</strong></el-col>
+          <el-col :span="18">{{ formatDate(feedback.responseAt) }}</el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6"><strong>回复内容：</strong></el-col>
+          <el-col :span="18">{{ feedback.response }}</el-col>
+        </el-row>
+      </div>
+    </el-card>
+
+    <!-- 没有回复时，显示输入框提交回复 -->
+    <el-card v-else class="box-card reply-card">
       <div slot="header" class="clearfix">
         <span>回复内容</span>
       </div>
@@ -55,29 +85,26 @@
 export default {
   data() {
     return {
-      feedback: {}, // 反馈详情
-      responseContent: "", // 回复内容
-      currentUser: "", // 当前登录用户
+      feedback: {},
+      responseContent: "",
+      currentUser: "",
     };
   },
   computed: {
-    // 获取反馈ID
     feedbackId() {
       return this.$route.params.id;
     },
   },
   methods: {
-    // 格式化时间
     formatDate(date) {
       return this.$moment(date).format("YYYY-MM-DD HH:mm:ss");
     },
-    // 获取当前登录用户
+
     getCurrentUser() {
       const token = localStorage.getItem("token");
       if (token) {
-        // 假设token中存储了用户名等信息
-        const decodedToken = JSON.parse(atob(token.split(".")[1])); // 解码token
-        this.currentUser = decodedToken.username || "匿名用户"; // 获取用户名
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        this.currentUser = decodedToken.username || "匿名用户";
       }
     },
     // 获取反馈详情
@@ -98,12 +125,14 @@ export default {
         return;
       }
 
+      this.getCurrentUser();
+
       const responseData = {
-        response: this.responseContent, // 提交字符串
-        responseUser: this.currentUser, // 使用当前用户的用户名
+        response: this.responseContent,
+        responseUser: this.currentUser,
       };
 
-      const token = localStorage.getItem("token"); // 假设你将 token 存储在 localStorage 中
+      const token = localStorage.getItem("token");
 
       if (!token) {
         this.$message.error("未登录或 token 无效");
@@ -111,7 +140,6 @@ export default {
       }
 
       try {
-        // 设置 Authorization 头
         const response = await this.$api.put(
           `/feedback/${this.feedbackId}`,
           responseData,
@@ -124,7 +152,7 @@ export default {
 
         if (response.data) {
           this.$message.success("回复提交成功");
-          this.$router.push("/my-feedback"); // 提交后返回到反馈列表
+          this.fetchFeedbackDetail();
         }
       } catch (error) {
         this.$message.error("提交回复失败");
@@ -132,8 +160,8 @@ export default {
     },
   },
   mounted() {
-    this.getCurrentUser(); // 页面加载时获取当前用户信息
-    this.fetchFeedbackDetail(); // 页面加载时获取反馈详情
+    this.getCurrentUser();
+    this.fetchFeedbackDetail();
   },
 };
 </script>
@@ -151,7 +179,7 @@ export default {
   font-size: 18px;
 }
 
-.submit-response-page {
+.view-response-page {
   padding: 40px;
   background-color: #fff;
 }
@@ -171,5 +199,22 @@ export default {
 .submit-btn {
   text-align: right;
   margin-top: 20px;
+}
+
+.response-detail {
+  margin-top: 20px;
+}
+
+.back-btn {
+  margin-right: 10px;
+  padding: 0;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fcb7c1b2;
+  color: #fff;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

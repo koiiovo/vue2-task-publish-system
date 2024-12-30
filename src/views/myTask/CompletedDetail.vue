@@ -2,7 +2,7 @@
   <div class="task-detail">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/my-task/completed' }">
         已完成任务
@@ -232,7 +232,6 @@ export default {
   border-color: #f0a500;
 }
 
-/* 返回按钮样式 */
 .back-btn {
   margin-right: 10px;
   padding: 0;

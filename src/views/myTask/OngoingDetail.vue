@@ -2,7 +2,7 @@
   <div class="task-detail">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/my-task/ongoing' }">
         进行中任务
@@ -144,7 +144,7 @@
           v-for="(file, index) in imageList"
           :key="index"
           :src="file.url"
-          style="width: 200px; margin-right: 10px;"
+          style="width: 200px; margin-right: 10px"
         ></el-image>
       </div>
     </el-card>
@@ -162,7 +162,7 @@ export default {
       },
       fileList: [],
       imageList: [],
-      uploadAction: "http://localhost:8080/task/files/upload",  // 后端上传接口地址
+      uploadAction: "http://localhost:8080/task/files/upload", // 后端上传接口地址
       activeStep: 0, // 当前步骤
     };
   },
@@ -285,7 +285,7 @@ export default {
 .task-description {
   white-space: pre-wrap;
   word-wrap: break-word;
-  max-height: 202px; /* 限制最大高度 */
+  max-height: 202px;
   overflow-y: auto;
   font-size: 14px;
   color: #333;
@@ -293,7 +293,7 @@ export default {
 }
 
 .upload-section {
-  display: flex; /* 使用flex布局 */
+  display: flex;
   margin-top: 20px;
 }
 

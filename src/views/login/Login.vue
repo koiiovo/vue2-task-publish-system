@@ -1,6 +1,5 @@
 <template>
   <div class="login-page">
-    <!-- 背景图层 -->
     <div class="background"></div>
 
     <!-- 登录表单容器 -->
@@ -35,7 +34,7 @@
       <!-- 密码输入框 -->
       <div class="input-container password-container">
         <input type="password" v-model="password" placeholder="请输入密码" />
-        <!-- 忘记密码链接 -->
+
         <p class="forgot-password">
           <router-link to="/forgot-password">忘记密码？</router-link>
         </p>
@@ -50,7 +49,7 @@
         </label>
       </div>
 
-      <!-- 登录按钮，动态变色和禁用 -->
+      <!-- 登录按钮 -->
       <button
         @click="handleLogin"
         class="login-button"
@@ -70,7 +69,9 @@
     <div v-if="showModal" class="modal">
       <div class="modal-content">
         <h3>服务协议与使用条款</h3>
-        <p>这是服务协议的内容...（这里可以放具体的服务条款）</p>
+        <p>
+          这是服务协议的内容...我也不知道写什么，随便打几个字吧，看起来字多一点，有点好看吧
+        </p>
         <button @click="closeTerms">关闭</button>
       </div>
     </div>
@@ -78,24 +79,22 @@
 </template>
 
 <script>
-
 export default {
   name: "Login",
   data() {
     return {
-      usernameOrId: "", // 存储输入的账号或管理员账号
-      password: "", // 存储输入的密码
+      usernameOrId: "",
+      password: "",
       isUserLogin: true, // 登录类型切换，默认为用户登录
-      agreeToTerms: false, // 服务协议同意状态
-      showModal: false, // 控制是否显示服务协议的模态框
-      users: [], // 存储从后台获取的用户数据
-      currentUser: null, // 当前登录的用户信息
+      agreeToTerms: false,
+      showModal: false,
+      users: [],
+      currentUser: null,
     };
   },
   created() {
-    // 检查用户是否已经登录，如果是，尝试刷新令牌
     this.checkLoginStatus();
-    // 从后端获取所有用户信息
+
     this.fetchUsers();
   },
   methods: {
@@ -150,24 +149,20 @@ export default {
 
       // 验证用户名和密码
       if (this.validateUsername() && this.validatePassword()) {
-        // 登录请求
         this.$api
           .post("/loginUser/login", {
             username: this.usernameOrId,
             password: this.password,
           })
           .then((response) => {
-            // 假设后端返回一个 token 和 refreshToken
             const token = response.data.data.token;
             const refreshToken = response.data.data.refreshToken;
-            console.log("登录成功，token: ", token); // 输出 token
+            console.log("登录成功，token: ", token);
 
-            // 存储 token 和 refreshToken
             localStorage.setItem("token", token);
             localStorage.setItem("refreshToken", refreshToken);
 
-            // 页面跳转
-            this.$router.push({ path: "/" }); // 登录成功后跳转到主页
+            this.$router.push({ path: "/home" });
           })
           .catch((error) => {
             console.error("登录失败：", error);
@@ -178,17 +173,14 @@ export default {
       }
     },
     checkLoginStatus() {
-      // 检查用户是否已经登录
       const token = localStorage.getItem("token");
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (token) {
-        // 如果令牌存在，验证令牌是否过期
         this.validateToken(token, refreshToken);
       }
     },
     validateToken(token, refreshToken) {
-      // 使用 Axios 调用后台接口，验证 token 是否有效
       this.$api
         .post("/loginUser/validate-token", { token })
         .then((response) => {
@@ -202,20 +194,19 @@ export default {
         });
     },
     refreshToken(refreshToken) {
-      // 刷新令牌的逻辑
       this.$api
         .post("/loginUser/refresh-token", {
           refreshToken,
         })
         .then((response) => {
           const newToken = response.data.data.token;
-          localStorage.setItem("token", newToken); // 存储新的令牌
+          localStorage.setItem("token", newToken);
           console.log("令牌刷新成功:", newToken);
         })
         .catch((error) => {
           console.error("刷新令牌失败", error);
           alert("登录状态过期，请重新登录！");
-          this.$router.push({ path: "/login" }); // 重定向到登录页面
+          this.$router.push({ path: "/" }); // 重定向到登录页面
         });
     },
     showTerms() {
@@ -230,7 +221,6 @@ export default {
 
 
 <style scoped>
-/* 页面背景图层 */
 .login-page {
   display: flex;
   justify-content: center;
@@ -349,7 +339,7 @@ export default {
   width: 100%;
   padding: 12px;
   border-radius: 25px;
-  background-color: #000000; /* 默认颜色 */
+  background-color: #000000;
   color: white;
   font-size: 14px;
   font-weight: bold;
@@ -368,7 +358,6 @@ export default {
   cursor: not-allowed;
 }
 
-/* 注册提示样式 */
 .register-prompt {
   font-size: 12px;
   color: white;
@@ -397,23 +386,23 @@ export default {
 .modal-content {
   background: white;
   padding: 20px;
-  border-radius: 10px; /* 圆角 */
-  width: 300px; /* 设置较小的宽度 */
-  max-width: 80%; /* 最大宽度限制 */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+  border-radius: 10px;
+  width: 300px;
+  max-width: 80%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   font-family: Arial, sans-serif;
   overflow-y: auto;
 }
 
 .modal-content h3 {
   margin-bottom: 10px;
-  font-size: 18px; /* 标题字号适当减小 */
+  font-size: 18px;
   color: #333;
   font-weight: bold;
 }
 
 .modal-content p {
-  font-size: 14px; /* 内容字号适当减小 */
+  font-size: 14px;
   color: #555;
   line-height: 1.5;
   margin-bottom: 15px;

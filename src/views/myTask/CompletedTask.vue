@@ -2,20 +2,24 @@
   <div class="view-task">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
       <el-breadcrumb-item>已完成任务</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card class="box-card">
-      <!-- 使用 flex 布局将标题和已赚取金额分开 -->
       <div slot="header" class="header-container">
         <span>已完成任务</span>
         <span class="earned-commission">已赚取：{{ totalEarned }} ￥</span>
       </div>
 
       <div class="task-table">
-        <el-table :data="pagedData" border style="width: 100%">
+        <el-table
+          v-if="tableData.length > 0"
+          :data="pagedData"
+          border
+          style="width: 100%"
+        >
           <el-table-column label="序号" width="100" align="center">
             <template slot-scope="scope">
               {{ scope.$index + 1 + (currentPage - 1) * pageSize }}
@@ -55,7 +59,13 @@
           <el-table-column label="紧急程度" width="110" align="center">
             <template slot-scope="scope">
               <el-tag
-                :type="scope.row.urgency === '高' ? 'danger' : scope.row.urgency === '中' ? 'warning' : 'success'"
+                :type="
+                  scope.row.urgency === '高'
+                    ? 'danger'
+                    : scope.row.urgency === '中'
+                    ? 'warning'
+                    : 'success'
+                "
               >
                 {{ scope.row.urgency }}
               </el-tag>
@@ -70,6 +80,16 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <!-- 当没有任务时显示醒目的提示信息 -->
+        <div v-else class="no-tasks">
+          <el-alert
+            title="看起来您还没有开始赚钱之旅，立即行动，完成第一个任务，赚取您的第一桶金！"
+            type="warning"
+            center
+            class="alert-message"
+          />
+        </div>
       </div>
 
       <div class="pagination-container">
@@ -94,8 +114,8 @@ export default {
       pageSize: 8,
       currentPage: 1,
       tableData: [],
-      totalEarned: 0, // 用来保存总佣金
-      status: "已完成", // 当前状态，您可以根据需要动态切换
+      totalEarned: 0,
+      status: "已完成",
     };
   },
   computed: {
@@ -108,7 +128,7 @@ export default {
   methods: {
     async fetchTasks() {
       try {
-        const token = localStorage.getItem("token"); // 从 localStorage 获取 token
+        const token = localStorage.getItem("token");
         if (!token) {
           this.$message.error("请先登录");
           return;
@@ -121,15 +141,17 @@ export default {
           },
         });
 
-        // 确保从 response.data.data 中获取任务列表
         if (Array.isArray(response.data.data.tasks)) {
           this.tableData = response.data.data.tasks;
-          this.totalItems = this.tableData.length; // 根据获取的数据更新总数
+          this.totalItems = this.tableData.length;
 
           // 计算佣金总和
-          this.totalEarned = this.tableData.reduce((sum, task) => sum + parseFloat(task.commission), 0);
+          this.totalEarned = this.tableData.reduce(
+            (sum, task) => sum + parseFloat(task.commission),
+            0
+          );
         } else {
-          this.$message.error("获取任务数据失败，返回数据格式不正确");
+          this.$message.error("暂无任务");
         }
       } catch (error) {
         console.error("请求错误:", error);
@@ -193,15 +215,30 @@ export default {
   margin-top: 20px;
 }
 
-/* 右上角佣金样式 */
+/* 佣金样式 */
 .header-container {
   display: flex;
-  justify-content: space-between; /* 使标题和佣金金额分开 */
+  justify-content: space-between;
   align-items: center;
 }
 
 .earned-commission {
   font-size: 16px;
   color: #67c23a;
+}
+
+.no-tasks {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.alert-message {
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #fbf3fb;
+  color: #e1a3ba;
+  border: 1px solid #ebdddd;
+  padding: 10px;
+  border-radius: 5px;
 }
 </style>

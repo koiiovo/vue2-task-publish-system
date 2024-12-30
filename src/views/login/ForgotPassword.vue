@@ -1,6 +1,5 @@
 <template>
   <div class="reset-password-page">
-    <!-- 页面背景层 -->
     <div class="background"></div>
 
     <!-- 表单容器 -->
@@ -12,13 +11,12 @@
 
       <!-- 步骤内容 -->
       <div v-if="step === 1">
-        <h2 class="form-title">输入姓名和学号</h2>
-        <input type="text" v-model="name" placeholder="姓名" />
+        <h2 class="form-title">输入真实姓名和学号</h2>
+        <input type="text" v-model="name" placeholder="真实姓名" />
         <input type="text" v-model="studentId" placeholder="学号" />
 
-        <!-- 显示学号和姓名不匹配的错误提示 -->
         <p v-if="studentMismatch" class="error-text">
-          学号和姓名不匹配，请重新输入。
+          学号和真实姓名不匹配，请重新输入。
         </p>
 
         <button @click="nextStep" class="next-button">下一步</button>
@@ -39,7 +37,6 @@
           @input="checkPassword"
         />
 
-        <!-- 显示密码错误信息 -->
         <p v-if="passwordError" class="error-text">密码不一致，请重新输入</p>
 
         <button @click="nextStep" class="next-button" :disabled="passwordError">
@@ -62,14 +59,14 @@ export default {
   data() {
     return {
       step: 1, // 当前步骤
-      name: "", // 姓名
-      studentId: "", // 学号
-      newPassword: "", // 新密码
-      confirmPassword: "", // 确认密码
-      passwordError: false, // 密码是否一致的标志
-      studentMismatch: false, // 学号和姓名是否匹配的标志
+      name: "",
+      studentId: "",
+      newPassword: "",
+      confirmPassword: "",
+      passwordError: false,
+      studentMismatch: false,
       progressWidth: 33, // 进度条宽度
-      registeredAccounts: [], // 已注册的账户列表
+      registeredAccounts: [],
     };
   },
   methods: {
@@ -90,14 +87,13 @@ export default {
       if (this.step === 1) {
         this.checkStudentInfo();
       } else if (this.step === 2) {
-        this.checkPasswordMatch(); // 检查密码是否一致
-        this.updatePassword(); // 这里调用 updatePassword
+        this.checkPasswordMatch();
+        this.updatePassword();
       } else if (this.step === 3) {
-        this.updatePassword(); // 调用更新密码的函数
+        this.updatePassword();
       }
     },
 
-    // 检查学号和姓名是否匹配
     checkStudentInfo() {
       const student = this.registeredAccounts.find(
         (user) =>
@@ -112,27 +108,24 @@ export default {
       }
     },
 
-    // 检查密码是否一致
     checkPassword() {
       this.passwordError = this.newPassword !== this.confirmPassword;
     },
 
-    // 检查密码是否一致并跳转
     checkPasswordMatch() {
       if (this.newPassword !== this.confirmPassword) {
         this.passwordError = true;
-        return; // 如果密码不一致，则阻止跳转
+        return;
       }
-      this.step = 3; // 密码一致，跳转到第三步
+      this.step = 3;
       this.progressWidth = 100;
     },
 
-    // 更新密码
     updatePassword() {
       const data = {
-        studentId: this.studentId, // 学号
-        fullName: this.name, // 姓名
-        password: this.newPassword, // 传递新密码
+        studentId: this.studentId,
+        fullName: this.name,
+        password: this.newPassword,
       };
 
       this.$api
@@ -150,14 +143,13 @@ export default {
           console.error("密码更新请求失败：", error);
         });
     },
-    // 返回登录页
+
     goToLogin() {
-      this.$router.push("/login");
+      this.$router.push("/");
     },
   },
 
   mounted() {
-    // 页面加载时获取已注册的账户
     this.fetchRegisteredAccounts();
   },
 };
@@ -165,7 +157,6 @@ export default {
 
 
   <style scoped>
-/* 页面背景图层 */
 .reset-password-page {
   display: flex;
   justify-content: center;
@@ -217,14 +208,12 @@ input {
   margin-bottom: 20px;
 }
 
-/* 错误提示 */
 .error-text {
   font-size: 12px;
   color: red;
   margin-bottom: 10px;
 }
 
-/* 进度条样式 */
 .progress-bar {
   width: 100%;
   height: 5px;
@@ -239,7 +228,6 @@ input {
   border-radius: 10px;
 }
 
-/* 下一步按钮 */
 .next-button {
   width: 100%;
   padding: 12px;
@@ -261,7 +249,6 @@ input {
   cursor: not-allowed;
 }
 
-/* 最后一步提示 */
 .success-container {
   display: flex;
   flex-direction: column;

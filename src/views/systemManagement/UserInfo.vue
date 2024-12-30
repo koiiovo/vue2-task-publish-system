@@ -2,7 +2,7 @@
   <div class="view-task">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的消息</el-breadcrumb-item>
       <el-breadcrumb-item>用户信息</el-breadcrumb-item>
     </el-breadcrumb>
@@ -70,11 +70,11 @@ export default {
         email: "",
         region: "",
       },
-      originalUserInfo: {}, // 用于存储初始用户信息
+      originalUserInfo: {},
       user: {
         avatar: "",
       },
-      isEditing: false, // 标志是否处于编辑状态
+      isEditing: false,
     };
   },
   methods: {
@@ -89,8 +89,6 @@ export default {
 
         // 提取嵌套的 `data` 对象
         const userData = response.data.data;
-
-        // 确保返回的数据正确赋值给 userInfo
         this.userInfo = {
           username: userData.username || "未填写", // 如果没有值，则显示"未填写"
           phone: userData.phone || "未填写",
@@ -101,7 +99,6 @@ export default {
         // 保存原始用户信息用于取消修改
         this.originalUserInfo = { ...this.userInfo };
 
-        // 如果用户头像信息存在，显示头像
         this.user.avatar = userData.avatar || "";
       } catch (error) {
         console.error("获取用户信息失败", error);
@@ -134,7 +131,7 @@ export default {
         );
         console.log(response.data);
         this.$message.success("用户信息更新成功");
-        this.originalUserInfo = { ...this.userInfo }; // 更新原始数据
+        this.originalUserInfo = { ...this.userInfo };
         this.isEditing = false; // 提交后退出编辑模式
       } catch (error) {
         console.error("更新用户信息失败", error);

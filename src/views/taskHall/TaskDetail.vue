@@ -2,7 +2,7 @@
   <div class="task-detail">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>任务大厅</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/view-task' }"
         >查看任务</el-breadcrumb-item
@@ -164,12 +164,12 @@ export default {
         );
 
         if (response.data.code === 200) {
-          this.task.status = "进行中";
-          this.task.assignee = username;
-          // 重新获取任务详情，以确保数据刷新
-          await this.fetchTaskDetail(this.task.taskName);
-          // 显示成功消息
-          this.$message.success(response.data.msg);
+          this.task.status = "进行中"; // 更新状态为进行中
+          this.task.assignee = username; // 更新接单人
+          // 强制刷新页面
+          window.location.reload(); // 刷新当前页面
+          // 显示接单成功的提示
+          this.$message.success("任务已成功接单！");
         }
       } catch (error) {
         console.error("请求错误:", error);
@@ -179,6 +179,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .breadcrumb {

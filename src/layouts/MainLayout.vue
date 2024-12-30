@@ -13,7 +13,11 @@
         <nav role="navigation">
           <ul>
             <!-- 首页菜单 -->
-            <li role="menuitem" aria-label="首页" @click.stop="navigateTo('/')">
+            <li
+              role="menuitem"
+              aria-label="首页"
+              @click.stop="navigateTo('/home')"
+            >
               <font-awesome-icon icon="fas fa-home" />
               首页
             </li>
@@ -102,32 +106,6 @@
               </ul>
             </li>
 
-            <!-- 我的团队菜单 -->
-            <li
-              role="menuitem"
-              aria-label="我的团队"
-              @click="toggleSubMenu('myTeam')"
-              :class="{ active: subMenu.myTeam }"
-            >
-              <font-awesome-icon icon="fas fa-users" />
-              我的团队
-              <font-awesome-icon
-                icon="fas fa-angle-down"
-                class="arrow-icon"
-                :class="{ rotated: subMenu.myTeam }"
-              />
-              <ul v-show="subMenu.myTeam">
-                <li
-                  role="menuitem"
-                  aria-label="成员列表"
-                  class="submenu-item"
-                  @click.stop="navigateTo('/my-team/members')"
-                >
-                  成员列表
-                </li>
-              </ul>
-            </li>
-
             <!-- 我的消息菜单 -->
             <li
               role="menuitem"
@@ -143,22 +121,6 @@
                 :class="{ rotated: subMenu.circle }"
               />
               <ul v-show="subMenu.circle">
-                <li
-                  role="menuitem"
-                  aria-label="通知"
-                  class="submenu-item"
-                  @click.stop="navigateTo('/my-message/inform')"
-                >
-                  通知
-                </li>
-                <li
-                  role="menuitem"
-                  aria-label="我的消息"
-                  class="submenu-item"
-                  @click.stop="navigateTo('/my-message/chat')"
-                >
-                  聊天
-                </li>
                 <li
                   role="menuitem"
                   aria-label="问题反馈"
@@ -192,14 +154,6 @@
                   @click.stop="navigateTo('/system-management/user-info')"
                 >
                   用户信息
-                </li>
-                <li
-                  role="menuitem"
-                  aria-label="系统设置"
-                  class="submenu-item"
-                  @click.stop="navigateTo('/system-management/settings')"
-                >
-                  系统设置
                 </li>
               </ul>
             </li>
@@ -270,11 +224,7 @@
               >
                 我的佣金
               </li>
-              <li
-                role="menuitem"
-                aria-label="退出"
-                @click="navigateTo('/login')"
-              >
+              <li role="menuitem" aria-label="退出" @click="navigateTo('/')">
                 退出
               </li>
             </ul>
@@ -304,7 +254,6 @@ export default {
       this.$set(this.subMenu, menu, !this.subMenu[menu]);
     },
     navigateTo(path) {
-      // 判断当前路由路径是否和目标路径相同，避免重复跳转
       if (this.$route.path !== path) {
         this.$router.push(path);
       }
@@ -325,10 +274,10 @@ h2 {
 .content {
   flex-grow: 1;
   background-color: #fff;
-  position: fixed; /* 固定内容区域 */
-  top: 110px; /* 根据你的布局设置顶部距离 */
-  left: 250px; /* 根据你的侧边栏宽度设置左侧距离 */
-  bottom: 0; /* 固定到页面底部 */
+  position: fixed;
+  top: 110px;
+  left: 250px;
+  bottom: 0;
   right: 0;
 }
 
@@ -345,7 +294,6 @@ h2 {
   margin: 0;
 }
 
-/* Logo 和标题容器 */
 .logo-container {
   display: flex;
   align-items: center;
@@ -496,7 +444,7 @@ h2 {
 
 .avatar {
   position: relative;
-  padding: 5px; /* 增加 padding 使得触发区域更大 */
+  padding: 5px; /* 触发区域增大 */
 }
 
 .avatar-img {
@@ -520,7 +468,7 @@ h2 {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   width: 120px;
   overflow: hidden;
-  z-index: 10; /* 确保菜单显示在其他内容之上 */
+  z-index: 10;
 }
 
 .avatar-menu ul {

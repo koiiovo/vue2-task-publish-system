@@ -171,10 +171,10 @@ export default {
   },
   methods: {
     navigateTo(path, queryParams = {}) {
-    if (this.$route.path !== path) {
-      this.$router.push({ path, query: queryParams });
-    }
-  },
+      if (this.$route.path !== path) {
+        this.$router.push({ path, query: queryParams });
+      }
+    },
     fetchTaskStats() {
       this.$api
         .get("/task/stats", {

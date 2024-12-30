@@ -2,7 +2,7 @@
   <div class="task-detail">
     <!-- 面包屑 -->
     <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
-      <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
+      <el-breadcrumb-item to="/home">首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的任务</el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/my-task/reviewing' }">
         审核中任务
@@ -172,12 +172,11 @@ export default {
 
     async verifyPassword() {
       // 直接验证密码是否为“666”
-      const isPasswordCorrect = this.password === "666"; // 设置密码为666
+      const isPasswordCorrect = this.password === "666";
       if (isPasswordCorrect) {
-        // 密码验证通过，更新任务状态为已完成
         this.task.isCompleted = true;
         this.activeStep = 2; // 设置步骤为“任务完成”
-        // 更新任务状态为已完成
+
         this.updateTaskStatusToCompleted();
 
         // 更新任务状态后，跳转到任务完成页面
@@ -248,7 +247,7 @@ export default {
 .task-description {
   white-space: pre-wrap;
   word-wrap: break-word;
-  max-height: 202px; /* 限制最大高度 */
+  max-height: 202px;
   overflow-y: auto;
   font-size: 14px;
   color: #333;
