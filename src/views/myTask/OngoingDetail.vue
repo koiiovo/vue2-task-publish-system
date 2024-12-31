@@ -126,26 +126,9 @@
           </el-form-item>
 
           <div class="submit-button-container">
-            <el-button type="primary" @click="handleSubmit">提交交付</el-button>
+            <el-button type="primary" @click="handleSubmit">交付材料</el-button>
           </div>
         </el-form>
-      </div>
-
-      <!-- 已上传文件展示 -->
-      <div v-if="fileList.length > 0">
-        <h3>已上传文件:</h3>
-        <div v-for="(file, index) in fileList" :key="index">
-          <a :href="file.url" target="_blank">点击下载文件</a>
-        </div>
-      </div>
-      <div v-if="imageList.length > 0">
-        <h3>已上传图片:</h3>
-        <el-image
-          v-for="(file, index) in imageList"
-          :key="index"
-          :src="file.url"
-          style="width: 200px; margin-right: 10px"
-        ></el-image>
       </div>
     </el-card>
   </div>

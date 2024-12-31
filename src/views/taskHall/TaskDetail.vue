@@ -164,16 +164,31 @@ export default {
         );
 
         if (response.data.code === 200) {
-          this.task.status = "进行中"; // 更新状态为进行中
+          this.task.status = "进行中"; // 更新状态
           this.task.assignee = username; // 更新接单人
-          // 强制刷新页面
-          window.location.reload(); // 刷新当前页面
-          // 显示接单成功的提示
           this.$message.success("任务已成功接单！");
+        } else {
+          const errorMessage = response.data.message || "未知错误";
+          if (errorMessage !== "成功") {
+            this.$message.error(`接单失败: ${errorMessage}`);
+          } else {
+            // 如果返回了“成功”，则不显示错误提示
+            this.$message.success("任务已成功接单！");
+          }
         }
       } catch (error) {
-        console.error("请求错误:", error);
-        this.$message.error("接单失败");
+        if (error.response) {
+          console.error("后端返回错误：", error.response.data);
+          this.$message.error(
+            "获取任务详情失败：" + error.response.data.message
+          );
+        } else if (error.request) {
+          console.error("请求未收到响应：", error.request);
+          this.$message.error("网络问题，无法获取任务详情");
+        } else {
+          console.error("错误信息：", error.message);
+          this.$message.error("获取任务详情失败：" + error.message);
+        }
       }
     },
   },

@@ -32,9 +32,9 @@
           <el-col :span="18">{{ feedback.username }}</el-col>
         </el-row>
         <el-row>
-          <el-col :span="6"><strong>问题描述：</strong></el-col>
-          <el-col :span="18">{{ feedback.description }}</el-col>
-        </el-row>
+  <el-col :span="6"><strong>问题描述：</strong></el-col>
+  <el-col :span="18" :style="{ whiteSpace: 'pre-line' }">{{ feedback.description }}</el-col>
+</el-row>
         <el-row>
           <el-col :span="6"><strong>提出时间：</strong></el-col>
           <el-col :span="18">{{ formatDate(feedback.createdAt) }}</el-col>
@@ -57,9 +57,9 @@
           <el-col :span="18">{{ formatDate(feedback.responseAt) }}</el-col>
         </el-row>
         <el-row>
-          <el-col :span="6"><strong>回复内容：</strong></el-col>
-          <el-col :span="18">{{ feedback.response }}</el-col>
-        </el-row>
+  <el-col :span="6"><strong>回复内容：</strong></el-col>
+  <el-col :span="18" :style="{ whiteSpace: 'pre-line' }">{{ feedback.response }}</el-col>
+</el-row>
       </div>
     </el-card>
 
@@ -96,6 +96,7 @@ export default {
     },
   },
   methods: {
+
     formatDate(date) {
       return this.$moment(date).format("YYYY-MM-DD HH:mm:ss");
     },

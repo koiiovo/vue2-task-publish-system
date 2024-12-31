@@ -123,17 +123,29 @@ export default {
     },
 
     async handleApprove() {
-      try {
-        await this.$api.put(`/task/update-passed/${this.task.taskName}`);
-        this.$message.success("任务已审核通过，状态已更新为已完成");
-        // 更新任务状态
-        this.task.status = "已完成";
-      } catch (error) {
-        console.error("请求错误:", error);
-        this.$message.error("更新任务状态失败");
+      // 根据任务状态和接单人检查不同的提示
+      if (this.task.status === "已发布" && !this.task.assignee) {
+        this.$message.error("任务没有接单人，无法通过审核");
+        return;
+      }
+
+      if (this.task.status === "进行中") {
+        this.$message.error("接单人还未提交材料，请耐心等待");
+        return;
+      }
+
+      if (this.task.status === "审核中") {
+        try {
+          await this.$api.put(`/task/update-passed/${this.task.taskName}`);
+          this.$message.success("任务已审核通过，状态已更新为已完成");
+          // 更新任务状态
+          this.task.status = "已完成";
+        } catch (error) {
+          console.error("请求错误:", error);
+          this.$message.error("更新任务状态失败");
+        }
       }
     },
-
     // 获取紧急程度的标签类型
     getUrgencyType(urgency) {
       return urgency === "高"

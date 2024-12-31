@@ -157,6 +157,12 @@
                 </li>
               </ul>
             </li>
+
+            <!-- GitHub菜单 -->
+            <li role="menuitem" aria-label="GitHub" @click.stop="goToGitHub">
+              <font-awesome-icon icon="fab fa-github" />
+              GitHub
+            </li>
           </ul>
         </nav>
       </div>
@@ -257,6 +263,12 @@ export default {
       if (this.$route.path !== path) {
         this.$router.push(path);
       }
+    },
+    goToGitHub() {
+      window.open(
+        "https://github.com/koiiovo/vue2-task-publish-system",
+        "_blank"
+      );
     },
   },
 };

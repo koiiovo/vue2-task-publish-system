@@ -179,7 +179,7 @@ export default {
       try {
         const response = await this.$api.get("/task/view");
         this.tableData = response.data; // 填充任务数据
-        this.totalItems = this.tableData.length; // 设置总任务数
+        this.updateTotalItems(); // 在数据加载完成后更新总任务数
       } catch (error) {
         console.error("获取任务列表失败", error);
       }
